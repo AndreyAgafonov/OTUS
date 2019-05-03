@@ -11,7 +11,7 @@ MACHINES = {
     :disks => {
 	:sata1 => {
 	    :dfile => homevb + '/sata1.vdi',
-	    :size => 40990,
+	    :size => 41990,
 	    :port => 1
 	},
     }
