@@ -1,0 +1,12 @@
+[Unit]
+Description=Script for generate nginx log
+
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /vagrant/get_nginx.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
