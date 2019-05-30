@@ -23,3 +23,10 @@ printf "   %s\n" $(awk '{print $2}' /proc/$i/stat)
 #printf "   %d\t" $index
 #printf "   %d\n" $index
 done
+
+
+ PID 
+ TTY 
+ STAT 
+ TIME 
+ COMMAND

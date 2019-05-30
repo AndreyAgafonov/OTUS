@@ -1,3 +1,5 @@
+#Служба для генератора логов nginx 
+
 [Unit]
 Description=Script for generate nginx log
 
