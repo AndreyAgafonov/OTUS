@@ -1,1 +1,1 @@
-{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/a.agafonov/Документы/github/OTUS/lession4","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"D:/Learing/OTUS/OTUS/lesson4","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}

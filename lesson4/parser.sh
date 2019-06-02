@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # написать скрипт для крона
-#который раз в час присылает на заданную почту 
+# который раз в час присылает на заданную почту 
 #- X IP адресов (с наибольшим кол-вом запросов) с указанием кол-ва запросов c момента последнего запуска скрипта
 #- Y запрашиваемых адресов (с наибольшим кол-вом запросов) с указанием кол-ва запросов c момента последнего запуска скрипта
 # - все ошибки c момента последнего запуска
@@ -13,56 +13,59 @@
 
 # Место положение лог nginx (можно при необхоидмсти заменить на опцию для скрипта, либо  вытащить из конфига NGINX
 LOGFILE=/vagrant/nginx.log
-LOGDIR=/var/log/nginx_parser
-PASRSERLOGFILE=$LOGDIR'/'`date +%F`'.nginx_parser.log'
+LOGDIR=/vagrant/nginx_parser/log
+PARSERLOGFILE=$LOGDIR'/'`date +%F`'.nginx_parser.log'
 PIDFILE=/var/run/nginx_parser.pid
 WORKDIR=/vagrant/nginx_parser
 HISTDIR=$WORKDIR'/history'
-SCRIPTTIME=`date +%d/%b/%Y:%T" "%z`
-
+RUNTIME=$(date +%Y/%B/%m" "%T%t%Z)
+#STOPTIME - в
+#LINESTART= Здесь будет значение с номер строки из последнего запуска
+LINEEND=$(wc -l $LOGFILE|awk '{print $1}')
 # Объявляем пути до рабочих файлов
 LASTRUN=$WORKDIR'/nginx_parser.lastrun'
 TMPFILE=$WORKDIR'/nginx_parser.tmp'
 RESULTFILE=$WORKDIR'/nginx_parser.result'
 
 
-CURRENTDATE='date'
-LASTRUN='date'
-
-
-
 #======================Понеслась====================
-# Проверяем, существует ли LOGDIR если нет - создаем его.
+# Проверяем, существует ли $WORKDIR если нет - создаем его.
+if [ ! -d $WORKDIR ] ;
+        then
+        mkdir -p $WORKDIR
+fi
+# Проверяем, существует ли $LOGDIR если нет - создаем его.
 if [ ! -d $LOGDIR ] ;
         then
         mkdir -p $LOGDIR
 fi
+# Проверяем, существует ли $HISTDIR если нет - создаем его.
+if [ ! -d $HISTDIR ] ;
+        then
+        mkdir -p $HISTDIR
+fi
 # Фиксируем время запуска скрипта и потом запишем в рабочий файл
-BEGIN=$SCRIPTTIME
-echo "begin analysing" >> $PASRSERLOGFILE
+echo "$RUNTIME Запуск скрипта" >> $PARSERLOGFILE
 
 # проверяем что файл LOGFILE существует
 if [ ! -e $LOGFILE ] ;
         then
-		touch $PASRSERLOGFILE
-        echo "$1 is not exists! No file specified for analysis!" >> $PASRSERLOGFILE; exit 1
+        echo "$(date +%Y/%B/%m" "%T%t%Z) Лог файл $1 для анализа на нейден! Анализировать нече, курим!!" >> $PARSERLOGFILE; exit 1
 fi
 if [ -d $LOGFILE ] ;
         then
-        echo "$1 is a directory!" >> $PASRSERLOGFILE; exit 1
+        echo "$(date +%Y/%B/%m" "%T%t%Z) $1 ОООО, да это папка, нафиг нафиг, мы так не договаривались!" >> $PARSERLOGFILE; exit 1
 fi
 
 
-# Защита от мультизапуска:
-# Запретим перезапись файлов через перенаправление вывода и
-# и попробуем записать в PIDFILE наш pid.
-# Если операция завершится с exitcode != 0, значит файл существует - выходим
+# Защита от мультизапуска: Запретим перезапись файлов через перенаправление вывода и
+# и попробуем записать в PIDFILE наш pid. Если операция завершится с exitcode != 0,
+# значит файл существует - выход 1.
 set -C
-echo $$ > $PIDFILE 2>/dev/null || { echo "PIDFILE $PIDFILE exists!"; exit 1; }
+echo $$ > $PIDFILE 2>/dev/null || { echo "$(date +%Y/%B/%m" "%T%t%Z) PIDFILE $PIDFILE Обнаружен. Скрипт уже работает! Завершите снакчала выполнение текущего скрипта."; exit 1; }
 set +C
 
-# Используем trap:
-# При выходе удаляем PIDFILE и мусор
+# Используем trap: При выходе удаляем PIDFILE и мусор
 trap "rm -f $PIDFILE $TMPFILE; exit" INT TERM EXIT
 
 
@@ -73,83 +76,56 @@ find $RESULTFILE 2>/dev/null && rm -f $RESULTFILE
 # Проверяем наличие файла с меткой о последнем запуске и создаём его, если таковой отсутствует, добавляя туда номер строки
 if [ ! -e $LASTRUN ] ;
         then
-        echo "$LASTRUN not exist. Analysing from begin." >> $PASRSERLOGFILE
+        echo "$(date +%Y/%B/%m" "%T%t%Z) $LASTRUN Не найден. Начинаем просмотр сначала." >> $PARSERLOGFILE
         echo "1" > $LASTRUN
 fi
+        LINESTART=$(cat $LASTRUN)
+        echo "$(date +%Y/%B/%m" "%T%t%Z) Анализируем лог с $LINESTART строки." >> $PARSERLOGFILE
+        # Фиксируем последнюю строку в файле метке
 
-# Сообщаем о времени. с которого начнётся анализ лога
-LASTTIME=`tail -n 1 $LASTRUN`
-echo "Start analysing from $LASTTIME"
-#
-# Копируем данные из источника в рабочий файл
-cat $1 > $TMPFILE
-#
-# Добавляем в файл временную метку для сортировки, сортируем м отрезаем лишнее
-echo "0.0.0.0 - - [$LASTTIME] specialmark1" >> $TMPFILE
-echo "0.0.0.0 - - [$BEGIN] specialmark2" >> $TMPFILE
-sort -o $TMPFILE -t ' ' -k 4.9,4.12n -k 4.5,4.7M -k 4.2,4.3n -k 4.14,4.15n -k 4.17,4.18n -k 4.20,4.21n $TMPFILE
-sed -i '0,/specialmark1/d' $TMPFILE
-sed -i '/specialmark2/,$d' $TMPFILE
-#
-# Пишем функцию, которой передадим файл для анализа и файл для записи результата
-analyse() {
-        FTARGETFILE=$1
-        FRESULTFILE=$2
-        ASTART=`head -n 1 $1 |awk '{print $4,$5}'`
-        AFINISH=`tail -n 1 $1 |awk '{print $4,$5}'`
-        echo "---" > $2
-        echo "Script start time - $BEGIN" >> $2
-        echo "Log has been analyzed from $ASTART to $AFINISH" >> $2
-        echo "---" >> $2
-        echo "The list of addresses with the most requests to the server (top 10 req-IP pairs)" >> $2
+# Копируем анализируемый диапазон  из источника в временный файл
+let "DELTA = LINEEND - LINESTART + 1"
+head -n $LINEEND $LOGFILE |tail -n $DELTA  > $TMPFILE
+
+# Функция, которая формирует текст для письма
+parser() {
+        # $1 - файл для анализа
+        # $2 - файл результат анализа
+        TIMEFROM=$(cat $1|head -n 1 |awk -F" " '{print $4}'|sed "s/\[//")
+        TIMETO=$(cat $1|tail -n 1 |awk -F" " '{print $4}'|sed "s/\[//")
+        echo "______________________" > $2
+        echo "Обрабатываемый временной диапазон с " $TIMEFROM  " по " $TIMETO >> $2
+        echo "______________________" >> $2
+        echo "ТОП IP адресов с максимальным количеством запросов " >> $2
         cat $1 |awk '{print $1}' |sort |uniq -c |sort -rn| head >> $2
-        echo "---" >> $2
-        echo "The list of server resources with the most requests from the clients (top 10 req-res pairs)" >> $2
+        echo "______________________" >> $2
+        echo "ТОП запросов" >> $2
         cat $1 |awk '{print $7}' |sort |uniq -c |sort -rn| head >> $2
-        echo "---" >> $2
-        echo "Total number of errors (status codes 4xx and 5xx, number-code pairs)" >> $2
-        cat $1 |awk '{print $9}' |grep -E "[4-5]{1}[0-9][0-9]" |sort |uniq -c |sort -rn >> $2
-        echo "---" >> $2
-        echo "The list of status codes with their total number (number-code pairs)" >> $2
+        echo "______________________" >> $2
+        echo "Полное количество ошибок (4ххб 5хх)" >> $2
+        cat $1 |awk '{print $9}' |egrep "^4|^5"|sort |uniq -c |sort -rn >> $2
+        echo "______________________" >> $2
+        echo "Все статусы запросов " >> $2
         cat $1 |awk '{print $9}' |sort |uniq -c |sort -rn >> $2
-        echo "---" >> $2
+        echo "______________________" >> $2
 }
-#
+
+
 # Выполняем анализ и отправляем письмо
-analyse $TMPFILE $RESULTFILE
-cat $RESULTFILE | mail -s "Message fron NGINX parser" $ADDRESS
-#
+parser $TMPFILE $RESULTFILE
+
+MAILTO="aagafonov@inbox.ru"
+SUBJECT="Parser NGINX Log $(date +%Y/%B/%m" "%T%t%Z)"
+BODY=$(cat $RESULTFILE)
+bash ./sendmail.sh $MAILTO $SUBJECT $BODY
+
 # Делаем копию отправленного файла, прибираемся и ставим метку последнего запуска
-cp $RESULTFILE $HISTORYDIR'/nginx_parser-'`date +%d%b%Y-%T`'.result'
+cp $RESULTFILE $HISTDIR'/nginx_parser-'`date +%d%b%Y-%T`'.result'
 rm -f $RESULTFILE
-echo $BEGIN > $LASTRUN
+
+# Оставляем  местку с какой строки стартовать в следующий раз.
+echo $LINEEND > $LASTRUN
+echo "$(date +%Y/%B/%m" "%T%t%Z) Работа скрипта завершена"  >> $PARSERLOGFILE
 exit 0
 
-
-
-
-
-
-
-
-
-
-#count IP 
-#count errors
-#return code
-awk -F"" '{pront $}' |sort -nu
-cat nginx.log |awk -F" " '{print $9}'|sort -n |uniq -c
-
-
-
->>
-
-
-
-
-
-
-
-
-
-# Andrey Agafonov , aagafonov@inbox.ru, 2019
+# Андрей Агафонов , aagafonov@inbox.ru, 2019
