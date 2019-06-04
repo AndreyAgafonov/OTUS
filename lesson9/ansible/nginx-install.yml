@@ -1,0 +1,16 @@
+---
+
+  become_user: True
+- task:
+  - name: TEst
+
+
+
+     - yum:
+        name: "{{ packages }}"
+           state: latest
+        vars:
+           packages:
+           - nginx
+           - mc
+           -
