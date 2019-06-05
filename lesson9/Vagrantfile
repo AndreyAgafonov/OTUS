@@ -51,11 +51,12 @@ Vagrant.configure("2") do |config|
       when "ansible"
         box.vm.provision "shell", run: "always", inline: <<-SHELL
           yum install epel-release -y
-          yum install ansible vim -y
+          yum install ansible vim  mc -y
           cp /vagrant/id_rsa /home/vagrant/.ssh/
           chown vagrant:vagrant /home/vagrant/.ssh/id_rsa
           chmod 0600 /home/vagrant/.ssh/id_rsa
-          echo "192.168.11.151  web" >> /etc/hosts
+          echo "192.168.11.151  web1" >> /etc/hosts
+          echo "192.168.11.152  web2" >> /etc/hosts
           # Create project structure
           mkdir ~/ansible
           SHELL
