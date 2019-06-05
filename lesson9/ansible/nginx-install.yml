@@ -3,6 +3,7 @@
     hosts: webservers
     become: true
     become_user: True
+    gather_facts: True
     tasks:
         - name: NGINX | Install EPEL Repo package from standart repo
           yum:
