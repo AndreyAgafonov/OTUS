@@ -2,52 +2,58 @@
   - name: lesson 9
     hosts: webservers
     become: true
-    become_user: True
+    become_user: root
     gather_facts: True
     tasks:
-        - name: NGINX | Install EPEL Repo package from standart repo
-          yum:
-            name: epel-release
-            state: present
-          tags:
-            - epel-package
-            - packages
+        - name: NGINX | Install nginx
+          block:
+          - name: Install Repo ELEL-Release
+            yum:
+              name: epel-release
+              state: present
+            tags:
+              - epel-package
+              - packages
 
-        - name: NGINX | Install mc package
-          yum:
-            name: mc
-            state: latest
-          tags:
-            - mc-packages
-            - packages
+          - name: NGINX | Install mc package
+            yum:
+              name: mc
+              state: latest
+            tags:
+              - mc-packages
+              - packages
 
-        - name: NGINX | Install NGINX package from EPEL Repo
-          yum:
-            name: nginx
-            state: latest
-          notify:
-            - restart nginx
-          tags:
-            - nginx-package
-            - packages
+          - name: NGINX | Install NGINX package from EPEL Repo
+            yum:
+              name: nginx
+              state: latest
+            notify:
+              - restart nginx
+            tags:
+              - nginx-package
+              - packages
 
-        - name: NGINX | Create NGINX config file from template
-          template:
-            src: templates/nginx.conf.j2
-            dest: /etc/nginx/nginx.conf
-          notify:
-            - reload nginx
-          tags:
-            - nginx-configuration
+          - name: NGINX | Create NGINX config file from template
+            template:
+              src: templates/nginx.conf.j2
+              dest: /etc/nginx/nginx.conf
+              mode: 0644
+              owner: root
+              group: root
+            notify:
+              - reload nginx
+            tags:
+              - nginx-configuration
+          when: ansible_facts['distribution'] == 'CentOS'
 
 
     handlers:
     - name: restart nginx
-       systemd:
+      systemd:
            name: nginx
            state: restarted
            enabled: yes
     - name: reload nginx
-       systemd:
+      systemd:
            name: nginx
            state: reloaded
