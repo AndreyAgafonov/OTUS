@@ -51,7 +51,8 @@ Vagrant.configure("2") do |config|
 		  #Устанавливаем супер сложный пароль )))
 		  echo qwerty12 | passwd sveta --stdin
 		  useradd nastya
-		  echo qwerty12 | passwd nastya --stdin
+      echo qwerty12 | passwd nastya --stdin
+      ip -4 a |grep inet
       SHELL
       end
 
