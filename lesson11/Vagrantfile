@@ -48,16 +48,10 @@ Vagrant.configure("2") do |config|
       sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
       sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
       
-#      echo "*;*;*;WdMo0000-2400" >> /etc/security/time.conf
       echo "+:(admin):ALL" >> /etc/security/access.conf
       echo "-:ALL:ALL" >> /etc/security/access.conf
       
       
-      #auth       [success=2 default=ignore] pam_time.so
-      #auth       required     pam_access.so
-      #auth       required     pam_exec.so /vagrant/pam_script_auth
-
-
 		  groupadd admin
 		  useradd -G admin sveta
 		  #Устанавливаем супер сложный пароль )))
