@@ -1,49 +1,35 @@
-## Linux Administrator course homework #17
+# PAM Пользователи и группы. Авторизация и аутентификация
 
-Внутри каталога homework17_Ansible сделать `vagrant up` 
+Задание 1. Запретить всем пользователям, кроме группы admin логин в выходные и праздничные дни
+Задание с "*" дать конкретному пользователю права работать с докером и возможность рестартить докер сервис
 
-Поднимется машина с именем vagrant1.
 
-1. Запретить всем пользователям, кроме группы admin логин в выходные и праздничные дни
+Поднимется машина с именем PAM.
 
-Особенностью этой машины будет то, что согласно первой задачи, 
-будут созданы 2 пользователя - vasya и petya, а также группа admin.
-
-vasya член группы admin, petya - нет
-
-С помощью pam_script обеспечивается, чтобы члены группы admin
-могли логиниться по выходным и праздникам, указанным в файле Holidays.
-
-2. Дать конкретному пользователю права рута
-
-Не знаю, что именно имелось в виду, но я придумал дать возможность получения su привилегий определенному пользователю через PAM
-
-Для этого, в файл /etc/pam.d/su добавляются строки
-
+Задание 1. Запретить всем пользователям, кроме группы admin логин в выходные и праздничные дни
+ Задание сделаное с испольтнованием API запроса на сайт https://isdayoff.ru/
+ 
+Создаю виртуальную машину:
+- разрешаю авотризацию по ssh:
 ```
-account         sufficient      pam_succeed_if.so user = vasya use_uid quiet
-
-account         required        pam_succeed_if.so user notin root:vagrant:vasya
+sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+systemctl restart sshd
 ```
-
-Соответственно, пользователь vasya получает возможность использовать повышение привилегий через su root.
-
-Еще, я добавил привилегии cap_sys_admin для пользователя vasya через файл /etc/pam.d/su
-
+- Корректирую правило аутентификации для sshd логика работы  - если день недели выходной или праздничный день, то проверяем правли доступа для группы admin иначе пропускаем шаг.
 ```
-$ vagrant ssh vagrant1
-[vagrant@vagrant1 ~]$ su - vasya
-Password:
-Last login: Thu Jul 12 14:06:24 UTC 2018 on pts/0
-[vasya@vagrant1 ~]$ capsh --print
-Current: = cap_sys_admin+i
-Bounding set =cap_chown,cap_dac_override,cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_linux_immutable,cap_net_bind_service,cap_net_broadcast,cap_net_admin,cap_net_raw,cap_ipc_lock,cap_ipc_owner,cap_sys_module,cap_sys_rawio,cap_sys_chroot,cap_sys_ptrace,cap_sys_pacct,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_time,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_setfcap,cap_mac_override,cap_mac_admin,cap_syslog,35,36
-Securebits: 00/0x0/1'b0
- secure-noroot: no (unlocked)
- secure-no-suid-fixup: no (unlocked)
- secure-keep-caps: no (unlocked)
-uid=1001(vasya)
-gid=1002(vasya)
-groups=1001(admin),1002(vasya)
-
+sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
 ```
+- Корректирую конфиг для pam_acceess.so Разрешение авторизовываться для группы "admin" остальным - запрещено
+```
+echo "+:(admin):ALL" >> /etc/security/access.conf
+echo "-:ALL:ALL" >> /etc/security/access.conf
+```
+- Создаю пользователей sveta член группы admin, nastya - нет.
+- Отключаю SELinux т.к. не входит в условия задачи и мешает работе текущей.
+
+При попытке авторизации пользотелем через протокол SSH будет запущен скрипт 'pam_script_auth', и произведена проверка согласно условиям задачи. Если cURL завершился с кодом отличным от "0" - сервис недоступен, используем данные системы, а именно проверяется день недели и сравниваниется - является ли он выходным, так же ппроверяется яавляется ли текущий день праздником согласно списку holidays (формат dd.mm).
+
+.
+
+

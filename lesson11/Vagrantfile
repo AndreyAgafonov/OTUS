@@ -36,22 +36,41 @@ Vagrant.configure("2") do |config|
         box.vm.provision "shell", run: "always", inline: <<-SHELL
 		  
 		  yum install epel-release -y
-      yum install pam_script ssh -y
+      yum install pam_script ssh mc docker docker-compose -y
 		  # Разрешаем авторизацию по паролю - если запрещено
 		  sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-      #0 Добавляем проверку  по условию задачи через скрипт
-      mkdir /etc/pamunlockscript
+      systemctl restart sshd
+      # Добавляем проверку  по условию задачи через скрипт
+      #mkdir /etc/pamunlockscript
       chmod +x /vagrant/pam_script_auth
-      cp /vagrant/pam_script_auth /etc/pamunlockscript/
+      #cp /vagrant/pam_script_auth /etc/pamunlockscript/
+      #Правило Для инициации проверки - Если сегодня выходной
+      sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+      sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
       
-      cp -f /vagrant/sshd /etc/pam.d/
-		  systemctl restart sshd
+#      echo "*;*;*;WdMo0000-2400" >> /etc/security/time.conf
+      echo "+:(admin):ALL" >> /etc/security/access.conf
+      echo "-:ALL:ALL" >> /etc/security/access.conf
+      
+      
+      #auth       [success=2 default=ignore] pam_time.so
+      #auth       required     pam_access.so
+      #auth       required     pam_exec.so /vagrant/pam_script_auth
+
+
 		  groupadd admin
 		  useradd -G admin sveta
 		  #Устанавливаем супер сложный пароль )))
 		  echo qwerty12 | passwd sveta --stdin
 		  useradd nastya
       echo qwerty12 | passwd nastya --stdin
+      # Отключаю SELinux - пока не понимаю почему блокируется
+      sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+      #Отключаю сразу, что бы не перезагружаться.
+      setenforce 0
+      # Задание со звездочкой.
+      #sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+      #sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
       ip -4 a |grep inet
       SHELL
       end
