@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #Определяем день недели через сервис API. Если недоступен - проверка на выходные встроенными средствами Linux.
 DW=$(curl https://isdayoff.ru/`date +%Y%m%d`)
-#DW=$(curl https://isdayoff.ru/20190509)
+curl https://isdayoff.ru/20190509
 #проверяем - работает ли сервис API
 if [[ "$?" -eq 0 ]] 
 then
