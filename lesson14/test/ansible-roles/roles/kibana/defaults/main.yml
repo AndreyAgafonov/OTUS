@@ -1,0 +1,7 @@
+---
+# defaults file for nginx
+nginx_pakages:
+    - nginx
+    - mc
+    - lsof
+    - htop

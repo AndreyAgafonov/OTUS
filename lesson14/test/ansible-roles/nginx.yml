@@ -1,0 +1,9 @@
+---
+  - name: lesson 14
+    hosts: webservers
+    become: true
+    gather_facts: True
+
+    roles:
+      - nginx
+

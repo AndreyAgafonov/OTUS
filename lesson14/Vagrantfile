@@ -3,13 +3,9 @@
 home = ENV['HOME']
 
 MACHINES = {
-  :elk => {
+  :pam => {
         :box_name => "centos/7",
         :ip_addr => '192.168.11.140',
-  },
-  :nginx => {
-        :box_name => "centos/7",
-        :ip_addr => '192.168.11.141',
   }
 }
 
@@ -36,57 +32,42 @@ Vagrant.configure("2") do |config|
       SHELL
 
       case boxname.to_s
-      when "elk"
+      when "pam"
         box.vm.provision "shell", run: "always", inline: <<-SHELL
 		  
 		  yum install epel-release -y
-      yum install ssh mc docker docker-compose -y
+      yum install pam_script ssh mc docker docker-compose -y
 		  # Разрешаем авторизацию по паролю - если запрещено
 		  sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
       systemctl restart sshd
+      # Добавляем проверку  по условию задачи через скрипт
+      #mkdir /etc/pamunlockscript
+      chmod +x /vagrant/pam_script_auth
+      #cp /vagrant/pam_script_auth /etc/pamunlockscript/
+      #Правило Для инициации проверки - Если сегодня выходной
+      sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+      sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
+      
+      echo "+:(admin):ALL" >> /etc/security/access.conf
+      echo "-:ALL:ALL" >> /etc/security/access.conf
       
       
+		  groupadd admin
+		  useradd -G admin sveta
+		  #Устанавливаем супер сложный пароль )))
+		  echo qwerty12 | passwd sveta --stdin
+		  useradd nastya
+      echo qwerty12 | passwd nastya --stdin
       # Отключаю SELinux - пока не понимаю почему блокируется
       sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
       #Отключаю сразу, что бы не перезагружаться.
       setenforce 0
-
+      # Задание со звездочкой.
+      #sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+      #sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
       ip -4 a |grep inet
       SHELL
-
-    
-    when "nginx"
-      box.vm.provision "shell", run: "always", inline: <<-SHELL
-    
-    yum install epel-release -y
-    yum update -y
-    yum install ssh mc nginx -y
-    # Разрешаем авторизацию по паролю - если запрещено
-    sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-    systemctl restart sshd
-    
-    groupadd admin
-    useradd -G admin sveta
-    #Устанавливаем супер сложный пароль )))
-    echo qwerty12 | passwd sveta --stdin
-    useradd nastya
-    echo qwerty12 | passwd nastya --stdin
-    # Отключаю SELinux - пока не понимаю почему блокируется
-    sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-    #Отключаю сразу, что бы не перезагружаться.
-    setenforce 0
-    # Задание со звездочкой.
-    #sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
-    #sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
-    ip -4 a |grep inet
-    SHELL
-    end
-
-
-
-
-
-
+      end
 
       end
    end

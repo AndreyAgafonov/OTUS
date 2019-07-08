@@ -1,0 +1,107 @@
+    - hosts: kibana_eu:kibana_usa:kibana_asia:kibana_office:kibana_remote
+      tasks:
+        - name: check if Elasticsearch is installed
+          package: name=elasticsearch state=present
+          check_mode: true
+          register: package_check
+
+        - name: Install dependencies
+          apt: pkg=rpl,locales-all,openjdk-8-jdk,apt-transport-https state=installed update_cache=true
+          when: package_check.changed
+
+        - name: Add repository key
+          apt_key: url=https://artifacts.elastic.co/GPG-KEY-elasticsearch state=present
+          when: package_check.changed
+
+        - name: Add repository
+          apt_repository: repo="deb https://artifacts.elastic.co/packages/5.x/apt stable main" state=present 
+          when: package_check.changed
+
+        - name: Tweak system vm.max_map_count
+          sysctl: name=vm.max_map_count value=262144 state=present reload=yes
+          when: package_check.changed
+
+        - name: Tweak system fs.file-max
+          sysctl: name=fs.file-max value=100000 state=present reload=yes
+          when: package_check.changed
+
+        - name: Tweak system vm.swappiness
+          sysctl: name=vm.swappiness value=1 state=present reload=yes
+          when: package_check.changed
+
+        - name: Tweak system limits
+          pam_limits: domain='*' limit_type=soft limit_item=nofile value=550000
+          when: package_check.changed
+
+        - name: Tweak system limits 2
+          pam_limits: domain='*' limit_type=hard limit_item=nofile value=550000
+          when: package_check.changed
+  
+        - name: Install Elasticsearch {{ elk_version }}
+          apt: pkg=elasticsearch={{ elk_version }} state=installed update_cache=true
+          when: package_check.changed
+
+        - name: Push Elasticsearch config file 
+          template: src=templates/elasticsearch.yml.j2 dest=/etc/elasticsearch/elasticsearch.yml mode=0640 owner=elasticsearch group=elasticsearch
+          when: package_check.changed
+          notify:
+            - restart elasticsearch
+
+        - name: Set {{ elastic_ram }} RAM for Elasticsearch JVM
+          lineinfile: dest=/etc/default/elasticsearch regexp="^#ES_JAVA_OPTS=" line="ES_JAVA_OPTS=-Xms{{ elastic_ram }} -Xmx{{ elastic_ram }}"
+          when: package_check.changed
+          notify:
+            - restart elasticsearch 
+
+        - name: Autostart service Elasticsearch
+          systemd: name=elasticsearch enabled=yes
+          when: package_check.changed
+
+        - name: Install Kibana {{ elk_version }}
+          apt: pkg=kibana={{ elk_version }} state=installed update_cache=true
+          when: package_check.changed
+
+        - name: Push Kibana config file
+          template: src=templates/kibana.yml.j2 dest=/etc/kibana/kibana.yml mode=644 owner=root group=root
+          when: package_check.changed
+          notify:
+            - restart kibana
+
+        - name: Autostart service Kibana
+          systemd: name=kibana enabled=yes
+          when: package_check.changed
+
+        - name: Install Logstash {{ elk_version }}
+          apt: pkg=logstash=1:{{ elk_version }}-1 state=installed update_cache=true
+          when: package_check.changed
+
+        - name: Autostart service Logstash
+          systemd: name=logstash enabled=yes
+          when: package_check.changed
+
+        - name: Install HAProxy
+          apt: pkg=haproxy state=installed update_cache=true
+          when: package_check.changed
+
+        - name: Push HAProxy config file
+          template: src=templates/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=0640 owner=root group=root
+          when: package_check.changed
+          notify:
+            - restart haproxy
+
+        - name: Autostart service HAProxy
+          systemd: name=haproxy enabled=yes
+          when: package_check.changed
+
+      handlers:
+        - name: restart elasticsearch
+          service: name=elasticsearch state=restarted
+
+        - name: restart logstash
+          service: name=logstash state=restarted
+
+        - name: restart kibana
+          service: name=kibana state=restarted
+
+        - name: restart haproxy
+          service: name=haproxy state=restarted
