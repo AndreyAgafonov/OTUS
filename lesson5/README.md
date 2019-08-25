@@ -12,7 +12,7 @@
 
 <details>
 
-<summary>nice_proc.sh</code></summary>
+<summary>nice.sh</code></summary>
 
 ```
 #!/usr/bin/env bash
