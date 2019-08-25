@@ -52,6 +52,7 @@ cat nice_log.log
 <details>
 
 <summary>nice_log.log</code></summary>
+
 ```
 
 [Sun Aug 25 14:14:23 MSK 2019] Start of script with low priority
@@ -62,5 +63,4 @@ cat nice_log.log
 
 [Sun Aug 25 14:14:26 MSK 2019] End of script with low priority
 ```
-
 </details>
