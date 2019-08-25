@@ -104,9 +104,10 @@ Vagrant.configure("2") do |config|
       cp /vagrant/nginx/index.html /usr/share/nginx/html/index.html
       cp /vagrant/filebeat.yml /etc/filebeat/filebeat.yml
       systemctl enable nginx
+      systemctl start nginx
       systemctl start filebeat
       systemctl enable filebeat
-      cp /vargrant/nginx.rules /etc/audit/rules.d
+      cp /vagrant/nginx.rules /etc/audit/rules.d
       service auditd restart
       sed -i '/\[Upload\]/a URL=http://192.168.11.140:9600' /etc/systemd/journal-upload.conf
       ip -4 a |grep inet --color

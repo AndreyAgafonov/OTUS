@@ -1,3 +1,10 @@
+processors:
+ - drop_event:
+     when:
+        or:
+          - contains:
+              message: INFO
+ 
 filebeat.inputs:
 - type: log
   enabled: true
@@ -26,5 +33,16 @@ filebeat.inputs:
   fields_under_root: true
   scan_frequency: 5s
 
+- type: log
+  enabled: true
+  paths:
+      - /var/log/*
+      - /var/log/*/*
+  fields:
+    type: other_logs
+  fields_under_root: true
+  scan_frequency: 5s
+  exclude_files: ['(nginx/error|nginx/access|audit).log$']
+ 
 output.logstash:
   hosts: ["192.168.11.140:5044"]
