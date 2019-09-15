@@ -1,20 +1,20 @@
 # OTUS
 OTUS
 
-- [x] Lesson 1 Делаем собственную сборку ядра
-- [X] Lesson 2 работа с mdadm.
-- [X] Lesson 3 Работа с LVM
-- [X] Lesson 4 Пишем скрипт
-- [X] Lesson 5 работаем с процессами
-- [ ] Lesson 6 Размещаем свой RPM в своем репозитории
-- [X] Lesson 7 Работа с загрузчиком
-- [ ] Lesson 8 Systemd
-- [X] :innocent: Lesson 9 Первые шаги с Ansible
-- [X] :sweat: Lesson 10 PAM
-- [ ] Lesson 11 Настраиваем бэкапы
-- [X] Lesson 12 Настройка мониторинга
-- [ ] :alien: Lesson 13 Настраиваем центральный сервер для сбора логов
-- [X] :innocent: Lesson 14 Docker, docker-compose, dockerfile
+- [x] [Lesson 1 Делаем собственную сборку ядра](Lesson01)
+- [X] [Lesson 2 работа с mdadm.](Lesson02)
+- [X] [Lesson 3 Работа с LVM](Lesson03)
+- [X] [Lesson 4 Пишем скрипт](Lesson04)
+- [X] [Lesson 5 работаем с процессами](Lesson05)
+- [ ] [Lesson 6 Размещаем свой RPM в своем репозитории](Lesson06)
+- [X] [Lesson 7 Работа с загрузчиком](Lesson07)
+- [ ] [Lesson 8 Systemd](Lesson08)
+- [X] [:innocent: Lesson 9 Первые шаги с Ansible](Lesson09)
+- [X] [:sweat: Lesson 10 PAM](Lesson10)
+- [ ] [Lesson 11 Настраиваем бэкапы](Lesson11)
+- [X] [Lesson 12 Настройка мониторинга](Lesson12)
+- [ ] [:alien: Lesson 13 Настраиваем центральный сервер для сбора логов](Lesson13)
+- [X] [:innocent: Lesson 14 Docker, docker-compose, dockerfile](Lesson14)
 - [ ] Lesson 15 разворачиваем сетевую лабораторию
 - [ ] Lesson 16 настраиваем split-dns
 - [ ] Lesson 17 LDAP
