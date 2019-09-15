@@ -1,13 +1,15 @@
 # OTUS
+
 OTUS
+
 Последовательность компиляции ядра:
-установил голую системы centos7 
+- установил голую системы centos7 
 изначальная версия ядра 3.10
-обновляю пакеты.
-yum -y update
-устанавливаю необходимые пакеты вместе с зависимостями:
-perl-parent-0.225-244.el7.noarch
-perl-HTTP-Tiny-0.033-3.el7.noarch
+- обновляю пакеты.
+  - yum -y update
+- устанавливаю необходимые пакеты вместе с зависимостями:
+  - perl-parent-0.225-244.el7.noarch
+  - perl-HTTP-Tiny-0.033-3.el7.noarch
 perl-podlators-2.5.1-3.el7.noarch
 perl-Pod-Perldoc-3.20-4.el7.noarch
 perl-Pod-Escapes-1.04-294.el7_6.noarch
