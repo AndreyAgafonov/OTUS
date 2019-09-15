@@ -1,9 +1,9 @@
 # OTUS
 OTUS
 
-[x] Lesson 1 Делаем собственную сборку ядра
-[X] Lesson 2 работа с mdadm.
-[X] Lesson 3 Работа с LVM
+- [x] Lesson 1 Делаем собственную сборку ядра
+- [X] Lesson 2 работа с mdadm.
+- [X] Lesson 3 Работа с LVM
 [X] Lesson 4 Пишем скрипт
 [X] Lesson 5 работаем с процессами
 [ ] Lesson 6 Размещаем свой RPM в своем репозитории
