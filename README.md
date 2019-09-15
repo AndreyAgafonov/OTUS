@@ -6,7 +6,7 @@ OTUS
 - [X] [Lesson 3 Работа с LVM](lesson03)
 - [X] [Lesson 4 Пишем скрипт](lesson04)
 - [X] [Lesson 5 работаем с процессами](lesson05)
-- [ ] [Lesson 6 Размещаем свой RPM в своем репозитории](lesson06)
+- [X] [Lesson 6 Размещаем свой RPM в своем репозитории](lesson06)
 - [X] [Lesson 7 Работа с загрузчиком](lesson07)
 - [ ] [Lesson 8 Systemd](lesson08)
 - [X] [:innocent: Lesson 9 Первые шаги с Ansible](lesson09)
