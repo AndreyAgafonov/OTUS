@@ -3,21 +3,21 @@
 yes | yum install -y -q wget rpmdevtools rpm-build tree yum-utils createrepo
 # Переходим в домашний каталог пользователя
 cd ~
-# Будем собирать httpd последней на данный момент версии со своими опциями.
+# Будем собирать Apache последней на данный момент версии скастомной страницей.
 # Тянем исходники с сайта apache.org
-wget http://mirror.linux-ia64.org/apache/httpd/httpd-2.4.39.tar.bz2 --directory-prefix=$HOME --quiet
+wget http://mirror.linux-ia64.org/apache/httpd/httpd-2.4.41.tar.bz2 --directory-prefix=$HOME --quiet
 wget https://www-us.apache.org/dist/apr/apr-1.7.0.tar.bz2 --directory-prefix=$HOME --quiet
 wget https://www-us.apache.org/dist//apr/apr-util-1.6.1.tar.bz2 --directory-prefix=$HOME --quiet
 # Делаем из архива с tar.bz2 пакет SRPM и устанавливаем его.
-rpmbuild -ts httpd-2.4.39.tar.bz2 1>/dev/null
+rpmbuild -ts httpd-2.4.41.tar.bz2 1>/dev/null
 rpmbuild -ts apr-1.7.0.tar.bz2 1>/dev/null
 rpmbuild -ts apr-util-1.6.1.tar.bz2 1>/dev/null
 # Установим полученный SRPM и получим в дереве rpmbuild архив с исходниками и spec-файл
-rpm -i $HOME/rpmbuild/SRPMS/httpd-2.4.39-1.src.rpm
+rpm -i $HOME/rpmbuild/SRPMS/httpd-2.4.41-1.src.rpm
 rpm -i $HOME/rpmbuild/SRPMS/apr-1.7.0-1.src.rpm
 rpm -i $HOME/rpmbuild/SRPMS/apr-util-1.6.1-1.src.rpm
 # Исходный архив нам уже не нужен
-rm $HOME/httpd-2.4.39.tar.bz2
+rm $HOME/httpd-2.4.41.tar.bz2
 rm $HOME/apr-1.7.0.tar.bz2
 rm $HOME/apr-util-1.6.1.tar.bz2
 tree ~
@@ -28,7 +28,7 @@ yes | yum-builddep -y -q $HOME/rpmbuild/SPECS/apr.spec
 yes | yum-builddep -y -q $HOME/rpmbuild/SPECS/apr-util.spec
 # Добавим в spec файл опции поддержки ldap и lua в режиме shared
 sed -i 's/--disable-imagemap/--disable-imagemap --enable-ldap=shared --enable-lua=shared/' $HOME/rpmbuild/SPECS/httpd.spec
-# ^_^ Починим баг spec-файла версии 2.4.39
+# ^_^ Починим баг spec-файла версии 2.4.41
 sed -i '/%{_libdir}\/httpd\/modules\/mod_watchdog.so/a %{_libdir}\/httpd\/modules\/mod_socache_redis.so' $HOME/rpmbuild/SPECS/httpd.spec
 # Установим окружение для сборки
 yes | yum install -y -q cpp gcc 
@@ -44,8 +44,8 @@ sudo rpm -i rpmbuild/RPMS/x86_64/apr-util-devel-1.6.1-1.x86_64.rpm
 yes | yum install -y -q mailcap
 # Собираем httpd и устанавливаем его
 rpmbuild --clean -bb $HOME/rpmbuild/SPECS/httpd.spec
-sudo rpm -i rpmbuild/RPMS/x86_64/httpd-2.4.39-1.x86_64.rpm
-# Теперь у нас есть собранный apache 2.4.39 - на нём и развернем репозиторий.
+sudo rpm -i rpmbuild/RPMS/x86_64/httpd-2.4.41-1.x86_64.rpm
+# Теперь у нас есть собранный apache 2.4.41 - на нём и развернем репозиторий.
 # Сначала сделаем локальный репозиторий из наших пакетов.
 mkdir $HOME/own_rpm_repo
 mkdir $HOME/own_rpm_repo/x86_64
@@ -84,12 +84,12 @@ rm -rf $HOME/rpmbuild/BUILDROOT/*
 yes | yum install -y -q yum-utils device-mapper-persistent-data lvm2
 yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 yes | yum install -y -q docker-ce docker-ce-cli containerd.io
-# Запустим docker и проверим его работоспособность
+#устанавливаем для диагностики 
+yum install -y lsof
+# Запустим docker
 systemctl enable docker
 systemctl start docker
 systemctl status docker
-docker run hello-world
-docker rmi hello-world
 # Запустим ранее написанный dockerfile и проверим его на работоспособность
 # Этот файл берет образ официальный образ centos и устанавливает туда httpd из нашего репозитория
 docker build /vagrant/ -t httpd:v1
@@ -99,16 +99,15 @@ curl http://localhost:8080/
 # Работает!
 # Теперь запушим наш образ на DockerHub
 # Сделаем корректные тэги 
-# docker tag httpd:v1 mbfx/otus_lab6_httpd:v1
+# docker tag httpd:v1 andreyagafonov/otus_lab6:v1
 # Залогинимся
 # sudo docker login
 # И пушим :)
-# sudo docker push mbfx/otus_lab6_httpd:v1
-# Смотреть тут https://hub.docker.com/r/mbfx/otus_lab6_httpd
+# sudo docker push andreyagafonov/otus_lab6:v1
 # 
 # А теперь попробуем очистить кеш docker, скачать наш образ и запустить его
-yes | docker rmi mbfx/otus_lab6_httpd:v1 -f
-docker run -p8081:80 -dit mbfx/otus_lab6_httpd:v1
+yes | docker rmi andreyagafonov/otus_lab6:v1 -f
+docker run -p8081:80 -dit andreyagafonov/otus_lab6:v1
 curl http://localhost:8081/
 # Работает!
 exit 0
