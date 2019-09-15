@@ -75,10 +75,12 @@ OTUS
 ```cd /usr/src```
 
 - Скачиваем исходиники ядра, разоривируем в папку ./linux/
-```  wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.0.10.tar.xz
+```
+  wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.0.10.tar.xz
   tar -xf linux-5.0.10.tar.xz
   mv linux-5.0.10 linux
-  cd linux```
+  cd linux
+  ```
   
 - Записываю  конфиг текущего ядра в .config
 ```cp /boot/config-3.10.0-862.el7.x86_64 /usr/src/linux/.config```
