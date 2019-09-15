@@ -1,3 +1,0 @@
-# Переменные для сервиса-скрипта поиска ключевого слова в логе. (/etc/sysconfig)
-LOG_SCRIPT=/var/log/logfile.log
-WRD="webappuser"

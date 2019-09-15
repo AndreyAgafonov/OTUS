@@ -1,9 +1,0 @@
-[Unit]
-Description=Script sheduller
-
-[Timer]
-OnUnitActiveSec=30
-Unit=logscript.service
-
-[Install]
-WantedBy=multi-user.target

@@ -1,8 +1,0 @@
-[Unit]
-Description=Log script. Ищет в фале ключевое слово.
-
-[Service]
-Type=oneshot
-EnvironmentFile=/etc/sysconfig/logscript
-ExecStart=/opt/logscript.sh $LOG_SCRIPT $WRD
-
