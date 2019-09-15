@@ -1,27 +1,25 @@
 #!/usr/bin/env bash
 #
 # Первое задание!
-# Ставим отправитель почты для извещений
-yes | yum -y -q install mailx
 # Развертываем монитор слова в логах
-cp /vagrant/task1/mbfx_logmon.service /etc/systemd/system/mbfx_logmon.service
-cp /vagrant/task1/mbfx_logmon.timer /etc/systemd/system/mbfx_logmon.timer
-cp /vagrant/task1/mbfx_logmon /etc/sysconfig/mbfx_logmon
+cp /vagrant/task1/logmon.service /etc/systemd/system/logmon.service
+cp /vagrant/task1/logmon.timer /etc/systemd/system/logmon.timer
+cp /vagrant/task1/logmon /etc/sysconfig/logmon
 # Вручную мы этот скрипт врядли будем запускать, поэтому расположим его в каталоге для приложений
-cp /vagrant/task1/mbfx_logmon.sh /opt/mbfx_logmon.sh
+cp /vagrant/task1/logmon.sh /opt/logmon.sh
 # Развернём тестовый файл
-cp /vagrant/task1/monitor.log /var/log/mbfx_monitor_test.log
+cp /vagrant/task1/monitor.log /var/log/monitor_test.log
 # Включим
 systemctl daemon-reload
-systemctl enable mbfx_logmon.service
-systemctl enable mbfx_logmon.timer
-systemctl start mbfx_logmon.service
-systemctl start mbfx_logmon.timer
+systemctl enable logmon.service
+systemctl enable logmon.timer
+systemctl start logmon.service
+systemctl start logmon.timer
 # Подождём и проверим
 echo "Wait 30 sec for testing."
 sleep 35
-systemctl status mbfx_logmon.service
-systemctl status mbfx_logmon.timer
+systemctl status logmon.service
+systemctl status logmon.timer
 # Первое задание выполнено!
 #
 # Второе задание!
@@ -34,11 +32,11 @@ yes | yum -y -q install spawn-fcgi
 yes | yum -y -q install httpd mod_fcgid
 rpm -ql spawn-fcgi
 # Анализ файлов из пакета spawn-fcgi показывает, что он имеет скрипт init.d
-# и, внезапно, файл /etc/sysconfig/spawn-cgi с закомментированными параметрами-примерами
+# и, файл /etc/sysconfig/spawn-cgi с закомментированными параметрами-примерами
 # Значит дальше будет чуть проще: нам подходят параметры из примера. Раскомментируем.
 sed -i 's/#SOCKET/SOCKET/' /etc/sysconfig/spawn-fcgi
 sed -i 's/#OPTIONS/OPTIONS/' /etc/sysconfig/spawn-fcgi
-# По ходу нам понадобится php ...
+# Нам понадобится php ...
 yes | yum -y -q install php php-cli
 # Установим подготовленный unit-файл
 cp /vagrant/task2/spawn-fcgi.service /etc/systemd/system/spawn-fcgi.service
@@ -58,7 +56,7 @@ systemctl status spawn-fcgi
 # в /usr/lib ломать ничего не будем - скопируем в административный каталог и будем делать всё там
 cp /usr/lib/systemd/system/httpd.service /etc/systemd/system/httpd@.service
 sed -i 's/EnvironmentFile=\/etc\/sysconfig\/httpd/EnvironmentFile=\/etc\/sysconfig\/httpd-config-%I/' /etc/systemd/system/httpd@.service
-sed -i 's/Description=The Apache HTTP Server/Description=The Apache HTTP Server (multiconfig edition by mbfx)/' /etc/systemd/system/httpd@.service
+sed -i 's/Description=The Apache HTTP Server/Description=The Apache HTTP Server (multiconfig edition by aav)/' /etc/systemd/system/httpd@.service
 # Подготовим файлы конфигураций httpd
 cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd-1.conf
 cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd-2.conf

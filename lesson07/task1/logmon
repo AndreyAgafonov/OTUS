@@ -1,0 +1,9 @@
+#!/bin/bash
+# Здесь указаны переменные для сервиса скрипта-монитора слова в логе
+
+LOG_TO_MON=/var/log/monitor_test.log
+WORD="KEY"
+
+
+
+# Этот файл отправится в /etc/sysconfig

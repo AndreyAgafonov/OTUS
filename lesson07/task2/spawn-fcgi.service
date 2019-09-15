@@ -1,11 +1,8 @@
-#
-# Aleksandr Gavrik, 2019, mbfx@mail.ru
-#
 # Описание сервиса для spawn-fcgi
 # Этот файл отправится в /etc/systemd/system
 # 
 [Unit]
-Description=Spawn-FCGI by mbfx for OTUS Lab7.
+Description=Spawn-FCGI for OTUS Lab7.
 # Без сети смысла поднимать веб-сервер немного
 After=network.target
 
