@@ -9,12 +9,12 @@ OTUS
 - [ ] Lesson 6 Размещаем свой RPM в своем репозитории
 - [X] Lesson 7 Работа с загрузчиком
 - [ ] Lesson 8 Systemd
-- [X] :innocent: esson 9 Первые шаги с Ansible
-- [X] Lesson 10 PAM
+- [X] :innocent: Lesson 9 Первые шаги с Ansible
+- [X] :sweat: Lesson 10 PAM
 - [ ] Lesson 11 Настраиваем бэкапы
 - [X] Lesson 12 Настройка мониторинга
-- [ ] Lesson 13 Настраиваем центральный сервер для сбора логов
-- [X] :innocent: esson 14 Docker, docker-compose, dockerfile
+- [ ] :alien: Lesson 13 Настраиваем центральный сервер для сбора логов
+- [X] :innocent: Lesson 14 Docker, docker-compose, dockerfile
 - [ ] Lesson 15 разворачиваем сетевую лабораторию
 - [ ] Lesson 16 настраиваем split-dns
 - [ ] Lesson 17 LDAP
@@ -30,3 +30,7 @@ OTUS
 - [ ] Lesson 27 PostgreSQL
 - [ ] Lesson 28 Vagrant стенд для NFS или SAMBA
 - [ ] Lesson 29 Проектная работа
+
+Если у вас есть вопросы пишите мне. :smile:
+Andrey
+aagafonov@inbox.ru
