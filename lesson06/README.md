@@ -14,13 +14,13 @@ LESSON 6 ###Размещаем свой RPM в своем репозитории
 
 <details> 
 Решение:
-[Vagrantfile](Vagrantfile) с [provisioning](provision.sh), который:
+[Vagrantfile](./Vagrantfile) с [provisioning](./provision.sh), который:
 * собирает httpd с некоторыми нужными зависимостями;
 * создает репозиторий rpm;
 * разворачивает репозиторий rpm через httpd;
 * устанавливает docker
 * используя dockerfile создает образ centos c httpd из нашего репозитория.
-* (далее образ был запушен в DockerHub, комментарии в конце [файла](provision.sh), инструкция к контейнеру на DockerHub'е) - [ссылка на DockerHub](https://hub.docker.com/r/mbfx/otus_lab6_httpd)
+* (далее образ был запушен в DockerHub, комментарии в конце [файла](./provision.sh), инструкция к контейнеру на DockerHub'е) - [DockerHub](https://cloud.docker.com/u/andreyagafonov/repository/docker/andreyagafonov/otus_lab6)
 </details>
 
 #Agafonov Andrey 2019 #aagafonov@inbox.ru
