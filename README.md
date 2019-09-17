@@ -8,7 +8,7 @@ OTUS
 - [X] [Lesson 5 работаем с процессами](lesson05)
 - [X] [Lesson 6 Размещаем свой RPM в своем репозитории](lesson06)
 - [X] [Lesson 7 Работа с загрузчиком](lesson07)
-- [ ] [Lesson 8 Systemd](lesson08)
+- [X] [Lesson 8 Systemd](lesson08)
 - [X] [:innocent: Lesson 9 Первые шаги с Ansible](lesson09)
 - [X] [:sweat: Lesson 10 PAM](lesson10)
 - [ ] [Lesson 11 Настраиваем бэкапы](lesson11)
