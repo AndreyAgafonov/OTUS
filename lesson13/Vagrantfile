@@ -1,15 +1,32 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-home = ENV['HOME']
+#
+# Инструкция:
+# Все настройки Vagrantfile должны выполняться исключительно через box MACHINES
+# остальные разделы  конфигураций неприкосновенны, это сделано для автоматизации и упрощения чтения файлов
+#
+# конфигурация машины указывается через переменные "machine_"
+#
+# Provision: все провижн файлы для каждой машины должны располагаться в папке с именем самоей виртуальной машины
+# 
+# Agafonov Andrey, 2019
+# @mailto: aagafonov@inbox.ru
+#
+
+
 # Определяем список машин ддя развертывания
 MACHINES = {
   :log => {
         :box_name => "centos/7",
         :ip_addr => '192.168.11.140',       
+        :machine_cpu => '4',
+        :machine_memory => '4096',
   },
   :nginx => {
         :box_name => "centos/7",
         :ip_addr => '192.168.11.141',
+        :machine_cpu => '1',
+        :machine_memory => '512',
   }
 }
 
@@ -23,35 +40,23 @@ Vagrant.configure("2") do |config|
         box.vm.host_name = boxname.to_s
         box.vm.network "private_network", ip: boxconfig[:ip_addr]
 
-
-        #общий провижн, что применяется для всех тачек
-        box.vm.provision "shell", inline: <<-SHELL
-            mkdir -p ~root/.ssh
-            cp ~vagrant/.ssh/auth* ~root/.ssh
-          SHELL
-
-        case boxname.to_s
-          when "log"
-            # конфигурация для конкретной машины 
-            box.vm.provider :virtualbox do |vb|
-              vb.customize ["modifyvm", :id, "--memory", "4096"]
-              vb.customize ["modifyvm", :id, "--cpus", "4"]
-              vb.name = boxname.to_s
-            end
-            # Провижн для конкретной машины 
-            box.vm.provision "shell", run: "always", path: "./provision_log.sh"    
-          when "nginx"
-            # конфигурация для конкретной машины 
-            box.vm.provider :virtualbox do |vb|
-              vb.customize ["modifyvm", :id, "--memory", "512"]
-              vb.customize ["modifyvm", :id, "--cpus", "2"]
-              vb.name = boxname.to_s
-            end
-            # Провижн для конкретной машины 
-            box.vm.provision "shell", run: "always", path: "./provision_nginx.sh"      
+        box.vm.provider :virtualbox do |box|
+            box.memory =  boxconfig[:machine_memory]
+            box.cpus =    boxconfig[:machine_cpu]          
+            box.name =    boxname.to_s
         end
+        #общий провижн, что применяется для всех тачек
+        box.vm.provision "shell", path: provision.sh
 
+        #переменные для окружения виртуалки
+        provision_path = './' + boxname.to_s + '/'
+        provision_script = provision_path +  'provision.sh'
+        #персональный провижн для каждой 
+        box.vm.provision "shell", path: provision_script, 
+          env: { 
+              "current_path" => provision_path
+          }      
     end
-   end
+  end
 end
 
