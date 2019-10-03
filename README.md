@@ -13,7 +13,7 @@ OTUS
 - [X] [:sweat: Lesson 10 PAM](lesson10)
 - [ ] [Lesson 11 Настраиваем бэкапы](lesson11)
 - [X] [Lesson 12 Настройка мониторинга](lesson12)
-- [ ] [:alien: Lesson 13 Настраиваем центральный сервер для сбора логов](lesson13)
+- [ ] [:alien: Lesson 13 Настраиваем центральный сервер для сбора логов](lesson*13*)
 - [X] [:innocent: Lesson 14 Docker, docker-compose, dockerfile](lesson14)
 - [ ] Lesson 15 разворачиваем сетевую лабораторию
 - [ ] Lesson 16 настраиваем split-dns
