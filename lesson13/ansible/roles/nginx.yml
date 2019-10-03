@@ -1,0 +1,10 @@
+---
+  - name: install nginx
+    hosts: webservers
+    become: true
+    gather_facts: True
+
+
+    roles:
+      - nginx
+

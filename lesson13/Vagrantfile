@@ -16,17 +16,23 @@
 
 # Определяем список машин ддя развертывания
 MACHINES = {
-  :log => {
-        :box_name => "centos/7",
-        :ip_addr => '192.168.11.140',       
-        :machine_cpu => '4',
-        :machine_memory => '4096',
-  },
-  :nginx => {
+  :web => {
         :box_name => "centos/7",
         :ip_addr => '192.168.11.141',
+        :machine_cpu => '2',
+        :machine_memory => '2048',
+  #},
+  #:log => {
+   #     :box_name => "centos/7",
+    #    :ip_addr => '192.168.11.140',
+     #   :machine_cpu => '4',
+      #  :machine_memory => '4096',
+  },
+  :ansible => { #must be last
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.100',
         :machine_cpu => '1',
-        :machine_memory => '512',
+        :machine_memory => '1024',
   }
 }
 
@@ -42,19 +48,28 @@ Vagrant.configure("2") do |config|
 
         box.vm.provider :virtualbox do |box|
             box.memory =  boxconfig[:machine_memory]
-            box.cpus =    boxconfig[:machine_cpu]          
+            box.cpus =    boxconfig[:machine_cpu]
             box.name =    boxname.to_s
         end
         #общий провижн, что применяется для всех тачек
-        box.vm.provision "shell", path: provision.sh
-
+        box.vm.provision "shell", inline: <<-SHELL
+			    bash +x /vagrant/provision.sh
+        SHELL
+        
         #переменные для окружения виртуалки
-        provision_path = './' + boxname.to_s + '/'
-        provision_script = provision_path +  'provision.sh'
+        provision_path = './' + boxname.to_s
+        provision_script = provision_path +  '/provision.sh'
+        provision_work_dir= '/vagrant/' + boxname.to_s
+        provision_box_name= boxname.to_s
+        #MACHINES.each do |boxname, boxconfig|
+        #provision_machines= MACHINES
+        #end
         #персональный провижн для каждой 
         box.vm.provision "shell", path: provision_script, 
           env: { 
-              "current_path" => provision_path
+              "vagrant_box_name" => provision_box_name,
+              "vagrant_work_dir" => provision_work_dir,
+              #"vagrant_machines" => provision_machines
           }      
     end
   end
