@@ -31,28 +31,23 @@
 
 Разворачиваю 4 виртуальные машины:
  - Ansible машина - для исключения проблем с настройками на разных ОС. Вся установка производится с помощью ролей с данной машины 
-  <details> 
- 
-[Roles Ansible](ansible) Составлены сиходя из решения - отдельная роль на каждую отдельное "фичу" которую можно переиспользовать независимо от на не зависимых машинах. Например [Nginx](ansible/roles/roles/nginx), [Filebeat](ansible/roles/roles/filebeat) и прочее... Для установки достаточно сформировать файл YML для установки роли, все необходимые зависимости роль доустановит сама.
-  <details> 
+        [Roles Ansible](ansible) Составлены сиходя из решения - отдельная роль на каждую отдельное "фичу" которую можно переиспользовать независимо от на не зависимых машинах. Например [Nginx](ansible/roles/roles/nginx), [Filebeat](ansible/roles/roles/filebeat) и прочее... Для установки достаточно сформировать файл YML для установки роли, все необходимые зависимости роль доустановит сама.
+
  - NGINX. Веб сервер NGINX.
- <details> 
-- Разворачиваю веб сервер [NGINX](ansible/roles/roles/nginx) который размещает на 80 порту [веб страничку](http://192.168.11.141), для удаленного сбора логов в стеке ELK
-- Установливаем [filebat](ansible/roles/roles/filebeat), который отправляет выбранные логи (access и error) в Logstash, который в свою очередь отправляется в ElasicSearch. 
-- Сервис [auditd](ansible/roles/roles/auditd_client/tasks/main.yml) отправляет все сообщения auditd на сервер ServerLog (log2).
-- Сервис [systemd-journal-upload](ansible/roles/roles/sd_jd_client) отправляет логи kournald на сервер логов
- </details> 
+    - Разворачиваю веб сервер [NGINX](ansible/roles/roles/nginx) который размещает на 80 порту [веб страничку](http://192.168.11.141), для удаленного сбора логов в стеке ELK
+    - Установливаем [filebat](ansible/roles/roles/filebeat), который отправляет выбранные логи (access и error) в Logstash, который в свою очередь отправляется в ElasicSearch. 
+    - Сервис [auditd](ansible/roles/roles/auditd_client/tasks/main.yml) отправляет все сообщения auditd на сервер ServerLog (log2).
+    - Сервис [systemd-journal-upload](ansible/roles/roles/sd_jd_client) отправляет логи kournald на сервер логов
+
  - Kinaba. Стек ELK.
- <details> 
- На машине в Docker разворачивается стек ELK [elasticsearch, kibana и logstash](ansible/roles/roles/kibana/tasks/main.yml). Веб "морда" [слушает](http://192.168.11.140:5601) на стандартном порту 5601.
- При первом входе необходимо указать "Index patterns" - в нашем случае достаточно указать "*" и @timestamp в качестве временной метки.
- </details> 
+    На машине в Docker разворачивается стек ELK [elasticsearch, kibana и logstash](ansible/roles/roles/kibana/tasks/main.yml). Веб "морда" [слушает](http://192.168.11.140:5601) на стандартном порту 5601.
+    При первом входе необходимо указать "Index patterns" - в нашем случае достаточно указать "*" и @timestamp в качестве временной метки.
+
  - ServerLog. - сервер для удаленного сбора логов через JournalD и Audit
-  <details> 
- На сервере настроено:
-  Сервис [auditd](ansible/roles/roles/auditd_server/tasks/main.yml) слушает на 60 порту то что приходит от Веб сервера.
-  Сервис [systemd-journal-remote](ansible/roles/roles/sd_jd_server/tasks/main.yml) собирает лого от удаленных систем.
- </details> 
+    На сервере настроено:
+    Сервис [auditd](ansible/roles/roles/auditd_server/tasks/main.yml) слушает на 60 порту то что приходит от Веб сервера.
+    Сервис [systemd-journal-remote](ansible/roles/roles/sd_jd_server/tasks/main.yml) собирает лого от удаленных систем.
+
 
 
 **Andrey Agafonov 2019 aagafonov@inbox.ru**
