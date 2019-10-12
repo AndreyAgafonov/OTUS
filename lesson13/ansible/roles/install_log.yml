@@ -1,0 +1,11 @@
+---
+  - name: install logserver juurnald
+    hosts: log2
+    become: true
+    gather_facts: True
+
+
+    roles:
+      - auditd_server
+      - sd_jd_server
+

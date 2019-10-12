@@ -1,0 +1,58 @@
+---
+# tasks file for nginx
+ - name: ElasticSearch install 
+   block:
+    - name: ELASTICSEARCH | Set value vm.max_map_count (For production mode required)
+      sysctl:
+        name: vm.max_map_count
+        value: 262144
+        sysctl_set: yes
+        state: present
+        reload: yes
+
+    - name: ELASTICSEARCH | Create work directory {{ elasticsearch_data }}
+      file:
+        path: "{{ elasticsearch_data }}"
+        state: directory
+        owner: vagrant
+        group: root
+        mode: '0744'
+
+    - name: ELASTICSEARCH | Delivery Docker-compose to a work Dir ("{{ elasticsearch_work_dir }}/docker-compose.yml")
+      template:
+        src: docker-compose.yml.j2
+        dest: "{{ elasticsearch_work_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+
+    - name: ELASTICSEARCH | install python-setup-tools
+      yum:
+        name: python-setuptools
+        state: latest
+    - name: ELASTICSEARCH | install pip
+      easy_install:
+        name: pip
+        state: latest
+
+    - name: ELASTICSEARCH | install docker-compose for python 
+      pip:
+        name:
+        - docker-compose
+
+    - name: ELASTICSEARCH | Run elasticserach in Docker Container ("{{ elasticsearch_work_dir }}")
+      docker_compose:
+        project_src: "{{ elasticsearch_work_dir }}"
+        build: yes
+      #register: output
+      tags:
+        - docker-copmose
+
+    - pause:
+        minutes: 1
+    - name: Check container elasticsearch status (GET) ant return 200 code
+      uri:
+        url: http://127.0.0.1:9200/_cat/health
+        method: GET
+      tags:
+        - health check
+   when: ansible_facts['distribution'] == 'CentOS'

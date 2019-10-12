@@ -1,0 +1,48 @@
+processors:
+ - drop_event:
+     when:
+        or:
+          - contains:
+              message: INFO
+ 
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+      - /var/log/nginx/access.log
+  fields:
+    type: nginx_access
+  fields_under_root: true
+  scan_frequency: 5s
+
+- type: log
+  enabled: true
+  paths:
+      - /var/log/nginx/error.log
+  fields:
+    type: nginx_error
+  fields_under_root: true
+  scan_frequency: 5s
+
+#- type: log
+#  enabled: true
+#  paths:
+#      - /var/log/audit/audit.log
+#  fields:
+#    type: audit_log
+#  fields_under_root: true
+#  scan_frequency: 5s
+
+#- type: log
+#  enabled: true
+#  paths:
+#      - /var/log/*
+#      - /var/log/*/*
+#  fields:
+#    type: other_logs
+#  fields_under_root: true
+#  scan_frequency: 5s
+#  exclude_files: ['(nginx/error|nginx/access|audit).log$']
+ 
+output.logstash:
+  hosts: ["{{ filebeat_logstash_server }}"]

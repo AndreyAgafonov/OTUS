@@ -1,0 +1,55 @@
+version: '2'
+services:
+  {{ elasticsearch_container_name }}:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: {{ elasticsearch_container_name }}
+    environment:
+      - node.name={{ elasticsearch_container_name }}
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - {{ elasticsearch_data }}:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      dockernet:
+        aliases:
+          - elasticsearch.dockernet
+
+  {{ kibana_container_name }}:
+    image: docker.elastic.co/kibana/kibana:7.4.0
+    container_name: {{ kibana_container_name }}
+    links:
+      - "{{ elasticsearch_container_name }}:elasticsearch"
+    ports:
+      - 5601:5601
+    networks:
+      dockernet:
+        aliases:
+          - kibana.dockernet
+
+  {{ logstash_container_name }}:
+    image: docker.elastic.co/logstash/logstash:{{ logstash_version }}
+    container_name: {{ logstash_container_name }}
+    links:
+      - "{{ elasticsearch_container_name }}:elasticsearch"
+    ports:
+      - 5044:5044
+    volumes:
+      - {{ logstash_conf_dir }}:/usr/share/logstash/pipeline
+
+    networks:
+      dockernet:
+        aliases:
+          - logstash.dockernet
+    depends_on:
+      - {{ elasticsearch_container_name }}
+
+networks:
+  dockernet:
+    external:
+      name: globalnetwork

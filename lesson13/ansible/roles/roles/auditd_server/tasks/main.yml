@@ -1,0 +1,21 @@
+---
+ - name: AUDITD_SERVER | Install&run auditd
+   block:
+
+    - name: AUDITD_SERVER | Install auditd
+      yum:
+        name: audit
+        state: present
+      tags:
+        - packages
+
+# Когда Сервер auditd_role == "server"
+    - name: AUDITD_SERVER | enable auditd listen port 
+      replace:
+        path: /etc/audit/auditd.conf
+        regexp: '^##tcp_listen_port = 60'
+        replace: "tcp_listen_port = 60"
+      notify: restart_auditd
+      
+    - name: AUDITD_SERVER | restart service
+      command: service auditd condrestart

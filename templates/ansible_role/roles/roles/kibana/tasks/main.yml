@@ -1,0 +1,95 @@
+---
+# tasks file for nginx
+ - name: KIBANA | Install Kibana
+   block:
+    - name: KIBANA | elasticsearch, set value vm.max_map_count (For production mode required)
+      sysctl:
+        name: vm.max_map_count
+        value: 262144
+        sysctl_set: yes
+        state: present
+        reload: yes
+
+    - name: KIBANA | elasticsearch, install python-setup-tools
+      yum:
+        name: python-setuptools
+        state: latest
+    - name: KIBANA | install pip
+      easy_install:
+        name: pip
+        state: latest
+
+    - name: KIBANA | elasticsearch, install docker-compose for python 
+      pip:
+        name:
+        - docker-compose
+
+    - name: KIBANA | Create a network
+      docker_network:
+        name: globalnetwork
+
+    - name: KIBANA | elasticsearch, Create work directory for elasticsearch {{ elasticsearch_data }}
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: vagrant
+        group: root
+        mode: '0744'
+      with_items:
+        - { path: "{{ elasticsearch_data }}" }
+        - { path: "{{ logstash_work_dir }}" }
+        - { path: "{{ logstash_conf_dir }}" }
+        - { path: "{{ logstash_data }}" }
+        - { path: "{{ kibana_work_dir }}" }
+
+#=====
+    - name: KIBANA | logstash, deliveryt input,output and filter config for logstash {{ logstash_work_dir }}
+      template:
+        backup: true
+        owner: root
+        group: root
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - { src: input.conf.j2, dest: "{{ logstash_conf_dir }}/input.conf" }
+        - { src: filter.conf.j2, dest: "{{ logstash_conf_dir }}/filter.conf" }
+        - { src: output.conf.j2, dest: "{{ logstash_conf_dir }}/output.conf" }
+
+#====
+    - name: KIBANA | Kibana, Delivery Docker-compose to a work Dir ("{{ kibana_work_dir }}/docker-compose.yml")
+      template:
+        backup: true
+        owner: root
+        group: root
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - { src: docker-compose.yml.j2, dest: "{{ kibana_work_dir }}/docker-compose.yml" }
+
+    - name: KIBANA | Run Kibana in Docker Container ("{{ kibana_work_dir }}")
+      docker_compose:
+        project_src: "{{ kibana_work_dir }}"
+        build: yes
+      #register: output
+      tags:
+        - docker-copmose
+
+    - pause:
+        minutes: 1
+
+    - name: Check container elasticsearch status (GET) ant return 200 code
+      uri:
+        url: http://127.0.0.1:9200/_cat/health
+        method: GET
+      tags:
+        - health check
+
+    - pause:
+        minutes: 1
+    - name: Check container elasticsearch status (GET) ant return 200 code
+      uri:
+        url: http://127.0.0.1:5601
+        method: GET
+      tags:
+        - health check
+   when: ansible_facts['distribution'] == 'CentOS'

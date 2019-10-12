@@ -1,0 +1,5 @@
+---
+# defaults file for audit
+# ONLY server OR client по умолчанию client - т.е. устанавливается как клиент
+log_server: 192.168.11.142
+audit_target: '-w /etc/nginx/ -p wa -k ngnix-config-modified'

@@ -1,0 +1,14 @@
+---
+# defaults file for kibana
+  elasticsearch_work_dir: "{{ datadrive }}/elasticsearch"
+  elasticsearch_data: "{{ elasticsearch_work_dir }}/data"
+  elasticsearch_container_name: es01
+  
+  logstash_version: "7.4.0"
+  logstash_container_name: logstash-01
+  logstash_work_dir: "{{ datadrive }}/logstash"
+  logstash_data: "{{ logstash_work_dir }}/data"
+  logstash_conf_dir: "{{ logstash_work_dir }}/conf.d"
+  
+  kibana_container_name: kibana-01
+  kibana_work_dir: "{{ datadrive }}/kibana"

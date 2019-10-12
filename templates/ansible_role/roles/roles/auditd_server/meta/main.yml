@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: Agafonov Andrey
+  description: Установка и включение Auditd server (Если сервер - вклчаем  listen port, если клиент необходимо указать адрес сервера для отправки логов аудита)
+  min_ansible_version: 2.8
+  galaxy_tags: [auditd]
+
+dependencies: 
+  - role: prepare
+...

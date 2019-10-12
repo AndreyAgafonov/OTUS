@@ -1,6 +1,3 @@
-#!/bin/bash
+#!/bin/bash		  
+        echo "IP адрес машины: " $(ip -4 a |grep inet 192 --color)
         
-        current_path="${current_path:-}"
-
-        echo $current_path
-        ip -4 a |grep inet --color

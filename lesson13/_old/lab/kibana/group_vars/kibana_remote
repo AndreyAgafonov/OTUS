@@ -1,9 +1,0 @@
-domain: sc-eu.local
-cluster_name: eu-kibana
-node_name: kibana-01
-elastic_dir: /var/lib/elasticsearch
-elk_version: 5.5.1
-elastic_ram: 9g
-
-
-

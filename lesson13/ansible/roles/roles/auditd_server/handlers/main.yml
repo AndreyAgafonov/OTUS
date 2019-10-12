@@ -1,0 +1,5 @@
+---
+#systemd не дружит с auditd и рестарт выполняется через service
+- name: restart_auditd 
+  command: service auditd condrestart
+

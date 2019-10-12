@@ -1,7 +1,0 @@
-domain: sc-eu.local
-cluster_name: eu
-elastic_dir: /var/lib/elasticsearch
-elastic_ram: 16g
-node_01: elastic-01.{{ domain }}
-node_02: elastic-02.{{ domain }}
-

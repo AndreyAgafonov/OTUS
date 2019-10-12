@@ -1,7 +1,0 @@
-[kibana_remote]
-192.168.88.16
-
-[kibana_remote:vars]
-ansible_ssh_user=root
-ansible_port=22
-

@@ -1,7 +1,0 @@
-[elastic]
-34.249.254.8
-
-[elastic:vars]
-ansible_ssh_user=v.filushin
-ansible_port=4423
-

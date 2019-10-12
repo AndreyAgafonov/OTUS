@@ -7,7 +7,7 @@
 #
 # конфигурация машины указывается через переменные "machine_"
 #
-# Provision: все провижн файлы для каждой машины должны располагаться в папке с именем самоей виртуальной машины
+# Provision: все провижн файлы для каждой машины должны располагаться в папке с именем самой виртуальной машины
 # 
 # Agafonov Andrey, 2019
 # @mailto: aagafonov@inbox.ru
@@ -16,17 +16,23 @@
 
 # Определяем список машин ддя развертывания
 MACHINES = {
+  :log2 => {
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.142',
+        :machine_cpu => '2',
+        :machine_memory => '1024',
+  },
   :web => {
         :box_name => "centos/7",
         :ip_addr => '192.168.11.141',
         :machine_cpu => '2',
         :machine_memory => '2048',
-  #},
-  #:log => {
-   #     :box_name => "centos/7",
-    #    :ip_addr => '192.168.11.140',
-     #   :machine_cpu => '4',
-      #  :machine_memory => '4096',
+  },
+  :log => {
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.140',
+        :machine_cpu => '4',
+        :machine_memory => '4096',
   },
   :ansible => { #must be last
         :box_name => "centos/7",

@@ -1,0 +1,10 @@
+galaxy_info:
+  author: Agafonov Andrey 
+  description: Playbook for install NGINX on Centos ditr
+  company: SC
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 2.8
+  galaxy_tags: []
+dependencies: 
+  - role: prepare
+  
