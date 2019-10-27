@@ -1,4 +1,4 @@
-<mxfile host="www.draw.io" modified="2019-10-27T18:11:48.208Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36" etag="-MOxy80t3r5BkbzG-Cc-" version="12.1.7" type="github" pages="1">
+<mxfile host="www.draw.io" modified="2019-10-27T18:19:01.635Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36" etag="-2JP1kQLb2abQlR5bjNh" version="12.1.7" type="github" pages="1">
   <diagram name="Page-1" id="d66fe2ae-3e9f-cf2f-6d29-e24063ad5d60">
     <mxGraphModel dx="6624" dy="1426" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
       <root>
@@ -7,7 +7,7 @@
         <mxCell id="GNllku7tNYGmGwUzNw3Q-3" value="&lt;font style=&quot;font-size: 80px&quot;&gt;Internet&lt;/font&gt;" style="aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image;image=img/lib/active_directory/internet_cloud.svg;" parent="1" vertex="1">
           <mxGeometry x="600" y="714" width="400" height="252" as="geometry"/>
         </mxCell>
-        <mxCell id="GNllku7tNYGmGwUzNw3Q-21" value="&amp;nbsp;Какая сеть?" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=48;" parent="1" source="GNllku7tNYGmGwUzNw3Q-4" target="GNllku7tNYGmGwUzNw3Q-3" edge="1">
+        <mxCell id="GNllku7tNYGmGwUzNw3Q-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=48;" parent="1" source="GNllku7tNYGmGwUzNw3Q-4" target="GNllku7tNYGmGwUzNw3Q-3" edge="1">
           <mxGeometry relative="1" as="geometry"/>
         </mxCell>
         <mxCell id="GNllku7tNYGmGwUzNw3Q-4" value="IRouter&lt;br&gt;192.168.255.1/30" style="fontColor=#0066CC;verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;fillColor=#CCCCCC;strokeColor=#6881B3;gradientColor=none;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.server;rounded=1;shadow=0;comic=0;labelBackgroundColor=#ffffff;fontSize=48;" parent="1" vertex="1">
