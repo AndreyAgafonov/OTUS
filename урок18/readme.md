@@ -118,3 +118,6 @@ Address|Netmask|Network|Broadcast|Hostmin|HostMax|Примечание
 Итогая схема сети 
 
 [Alt]("Сетевая лаборатория схема сети.svg")
+
+
+[Alt](<iframe frameborder="0" style="width:100%;height:400px;" src="https://www.draw.io?lightbox=1#Uhttps%3A%2F%2Fgithub.com%2FAndreyAgafonov%2FOTUS%2Fblob%2Fmaster%2Flesson18%2F%25D0%25A1%25D0%25B5%25D1%2582%25D0%25B5%25D0%25B2%25D0%25B0%25D1%258F%2520%25D0%25BB%25D0%25B0%25D0%25B1%25D0%25BE%25D1%2580%25D0%25B0%25D1%2582%25D0%25BE%25D1%2580%25D0%25B8%25D1%258F%2520%25D1%2581%25D1%2585%25D0%25B5%25D0%25BC%25D0%25B0%2520%25D1%2581%25D0%25B5%25D1%2582%25D0%25B8.svg"></iframe>)
