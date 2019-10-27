@@ -116,4 +116,5 @@ Address|Netmask|Network|Broadcast|Hostmin|HostMax|Примечание
 
 ### Практическая часть
 Итогая схема сети 
-()[]
+
+[Alt]("Сетевая лаборатория схема сети.svg")
