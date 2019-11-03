@@ -1,0 +1,19 @@
+---
+# LDAP (FreeIPA) client
+domain: cloud16.test # Имя домена
+realm: CLOUD16.TEST # Имя рилма Kerberos
+servername: freeipa # Имя сервера FreeIPA
+server: freeipa.cloud16.test # FQDN сервера FreeIPA
+ipa_ip: 192.168.11.117 # IP адрес сервера FreeIPA
+password: ipapassword # Пароль администратора
+principal: admin # Имя пользователя администратора
+hostname: client # Имя этой машины
+my_ip: 192.168.11.118 # IP адрес клиента (этой машины)
+ntp_timezone: Europe/Moscow # Часовой пояс
+username: test_ssh # Логин пользователя
+userpassword: test_ssh #Пароль пользователя
+givenname: тестовый пользователь # Имя пользователя
+sn: тестовый # Фамилия пользователя
+tel: 89030000000 # Номер телефона пользователя
+mail: test@cloud16.test # Почтовый ящик пользователя
+...
