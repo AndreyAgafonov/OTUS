@@ -11,15 +11,15 @@ OTUS
 - [X] [Lesson 8 Systemd](lesson08)
 - [X] [:innocent: Lesson 9 Первые шаги с Ansible](lesson09)
 - [X] [:sweat: Lesson 10 PAM](lesson10)
-- [ ] [Lesson 11 Настраиваем бэкапы](lesson11)
+- [X] [Lesson 11 Настраиваем бэкапы](lesson11)
 - [X] [Lesson 12 Настройка мониторинга](lesson12)
-- [ ] [:alien: Lesson 13 Настраиваем центральный сервер для сбора логов](lesson*13*)
+- [X] [:alien: Lesson 13 Настраиваем центральный сервер для сбора логов](lesson*13*)
 - [X] [:innocent: Lesson 14 Docker, docker-compose, dockerfile](lesson14)
-- [ ] Lesson 15 разворачиваем сетевую лабораторию
+- [X] [Lesson 18 разворачиваем сетевую лабораторию](lesson18)
 - [ ] Lesson 16 настраиваем split-dns
-- [ ] Lesson 17 LDAP
+- [X] [Lesson 16 LDAP](lesson16)
 - [ ] Lesson 18 OSPF
-- [ ] Lesson 19 Сценарии iptables
+- [ ] [Lesson 20 Фильтрация трафика, сценарии iptables](lesson20)
 - [ ] Lesson 20 VPN
 - [ ] Lesson 21 строим бонды и вланы
 - [ ] Lesson 22 Простая защита от DDOS

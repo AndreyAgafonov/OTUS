@@ -1,0 +1,11 @@
+---
+allow_duplicates: true
+galaxy_info:
+  author: Agafonov Andrey 
+  description: "Плейбук для подготовки виртуалки для работы с filebeat. Устанавливаются все пакеты и необходимые действия, в случае если они должны выполняться на всех машинах, что бы не делать по отделальности на каждой машине."
+  company: "cloud16.ru"
+  license: BSD
+  min_ansible_version: 1.0
+  galaxy_tags: []
+dependencies: 
+  - role: prepare

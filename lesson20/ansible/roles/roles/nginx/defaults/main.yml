@@ -1,0 +1,6 @@
+---
+# defaults file for nginx
+nginx_pakages:
+    - nginx
+nginx_listen_port: 8080
+nginx_root_dir: /usr/share/nginx/html
