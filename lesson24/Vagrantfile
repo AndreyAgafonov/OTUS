@@ -1,0 +1,113 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+# шпаргалка для себя
+#Router1
+# 10.123.19.0/24 -net1-2
+# 10.123.20.0/24 -net1-3
+
+#Router2
+# 10.123.19.0/24 -net1-2
+# 10.123.18.0/24 -net2-3
+
+#Router3
+# 10.123.20.0/24 -net1-3
+# 10.123.18.0/24 -net2-2
+
+
+MACHINES = {
+  :router1 => {
+          :box_name => "centos/7",
+          #:public => {:ip => '10.10.10.1', :adapter => 1},
+          :net => [
+                   {ip: '10.123.19.1', adapter: 2, netmask: "255.255.255.0", virtualbox__intnet: "net1-2"},
+                   {ip: '10.123.20.1', adapter: 3, netmask: "255.255.255.0",  virtualbox__intnet: "net1-3"},
+                ]
+  },
+
+  :router2 => {
+          :box_name => "centos/7",
+          :net => [
+                    {ip: '10.123.19.2', adapter: 2, netmask: "255.255.255.0", virtualbox__intnet: "net1-2"},
+                    {ip: '10.123.18.2', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "net2-3"},
+                ],
+  },
+
+  :router3 => {
+          :box_name => "centos/7",
+          :net => [
+                    {ip: '10.123.20.3', adapter: 2, netmask: "255.255.255.0", virtualbox__intnet: "net1-3"},
+                    {ip: '10.123.18.3', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "net2-3"},
+                    {ip: '172.19.1.1', adapter: 4, netmask: "255.240.0.0", virtualbox__intnet: "netX"},
+                ]
+  },
+
+  :testServer1 => {
+          :box_name => "centos/7",
+          :net => [
+                    {ip: '172.20.6.10', adapter: 2, netmask: "255.240.0.0", virtualbox__intnet: "netX"},
+                ]
+  },
+
+  :ansible => { #must be last
+          :box_name => "centos/7",
+          :net => [
+                    {ip: '10.123.20.10', adapter: 2, netmask: "255.255.255.0", virtualbox__intnet: "net1-3"},
+                    {ip: '10.123.19.10', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "net1-2"},
+                    {ip: '10.123.18.10', adapter: 4, netmask: "255.255.255.0", virtualbox__intnet: "net2-3"},
+                ],
+  }
+}
+
+Vagrant.configure("2") do |config|
+
+  MACHINES.each do |boxname, boxconfig|
+
+    config.vm.define boxname do |box|
+
+        box.vm.box = boxconfig[:box_name]
+        box.vm.host_name = boxname.to_s
+
+        boxconfig[:net].each do |ipconf|
+          box.vm.network "private_network", ipconf
+        end
+
+        box.vm.provider :virtualbox do |vb|
+          vb.customize ["modifyvm", :id, "--memory", "256"]
+          vb.customize ["modifyvm", :id, "--cpus", "1"]
+          vb.name = boxname.to_s
+          end
+
+        if boxconfig.key?(:public)
+          box.vm.network "public_network", boxconfig[:public]
+        end
+
+        box.vm.provision "shell", inline: <<-SHELL
+        bash +x /vagrant/provision.sh
+        SHELL
+
+        case boxname.to_s
+
+            when "testServer1"
+              box.vm.provision "shell", run: "always", inline: <<-SHELL
+                ip route delete default 2>&1 >/dev/null || true
+                ip route add default via 172.19.1.1 #2>&1 >/dev/null || true
+                SHELL
+
+          when "ansible"
+            provision_path = './' + boxname.to_s
+            provision_script = provision_path +  '/provision.sh'
+            provision_work_dir= '/vagrant/' + boxname.to_s
+            provision_box_name= boxname.to_s
+            box.vm.provision "shell", run: "always", path: provision_script
+
+        end
+
+      end
+
+  end
+
+
+end
