@@ -52,7 +52,10 @@
 - name : add other route to ospfd (only for router3)
   lineinfile:
     path: /etc/frr/ospfd.conf
-    line: network 172.16.0.0/12 area 0
+    line: "{{ item }}"
+  with_items:
+      - { network 172.16.0.0/12 area 0 }
+      - { no passive-interface eth3 }
   when: hostname == "router3"
 
 - name: frr activate ospfd

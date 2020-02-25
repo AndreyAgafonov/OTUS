@@ -28,15 +28,12 @@ ip ospf dead-interval 10
 !interface lo
 !
 router ospf
-!ospf router-id {{ loop_address }}
-!passive-interface eth0
-!passive-interface eth1
-!passive-interface lo
+ospf router-id {{ loop_address }}
+passive-interface default
+no passive-interface vlanid_1_config_device
+no passive-interface vlanid_2_config_device
 network {{ vlanid_1_network }}/{{ vlanid_1_netmask }} area 0
 network {{ vlanid_2_network }}/{{ vlanid_2_netmask }} area 0
 !network {{ loop_address }}/{{ loop_netmask }} area {{ loop_area }}
-neighbor {{ vlanid_1_neighor }}
-neighbor {{ vlanid_2_neighor }}
 !
-default-information originate always
-!
+

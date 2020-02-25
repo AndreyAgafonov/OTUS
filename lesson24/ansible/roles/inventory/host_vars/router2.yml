@@ -1,4 +1,5 @@
 hostname: router2
+
 vlanid_1_config_device: eth1
 vlanid_1_network: 10.123.19.0
 vlanid_1_netmask: 24
@@ -13,6 +14,6 @@ vlanid_2_address: 10.123.18.1
 vlanid_2_cost: 10
 vlanid_2_neighor: 10.123.18.3
 
-loop_address: 127.0.0.2
+loop_address: 0.0.0.2
 loop_netmask: 32
 loop_area: 1
