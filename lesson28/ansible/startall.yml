@@ -1,0 +1,8 @@
+---
+- name: Run deploy nginx lesson 28 OTUS
+  hosts: webserver
+  become: true
+
+  roles:
+    - nginx
+

@@ -18,11 +18,11 @@ OTUS
 - [X] [Lesson 18 разворачиваем сетевую лабораторию](lesson18)
 - [ ] Lesson 16 настраиваем split-dns
 - [X] [Lesson 16 LDAP](lesson16)
-- [ ] Lesson 18 OSPF
-- [ ] [Lesson 20 Фильтрация трафика, сценарии iptables](lesson20)
+- [X] Lesson 18 OSPF
+- [X] [Lesson 20 Фильтрация трафика, сценарии iptables](lesson20)
 - [ ] Lesson 20 VPN
 - [ ] Lesson 21 строим бонды и вланы
-- [ ] Lesson 22 Простая защита от DDOS
+- [X] Lesson 22 Простая защита от DDOS
 - [ ] Lesson 23 Собрать стенд с 3мя проектами на выбор
 - [ ] Lesson 24 развернуть базу из дампа и настроить репликацию
 - [ ] Lesson 25 mysql cluster

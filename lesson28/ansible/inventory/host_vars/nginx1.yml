@@ -1,0 +1,4 @@
+hostname: nginx1 #prepare
+domain: otus #prepare
+conf_path: /etc/nginx/conf.d/
+ansible_host: 192.168.11.110

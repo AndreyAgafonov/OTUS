@@ -1,0 +1,31 @@
+---
+# tasks file for nginx
+- name: NGINX | Install packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+  - "{{ nginx_pakages }}"
+  notify:
+    - restart_nginx
+  tags:
+    - nginx-package
+    - packages
+
+- name: NGINX | Create NGINX config file from template
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    #/etc/nginx/nginx.conf
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - { src: php-fpm.conf.j2 , dest: "{{ conf_path }}php-fpm.conf" }
+    - { src: python.conf.j2 , dest: "{{ conf_path }}python.conf" }
+    - { src: js.conf.j2 , dest: "{{ conf_path }}js.conf" }
+  notify:
+    - restart_nginx
+  tags:
+    - nginx-configuration
+
