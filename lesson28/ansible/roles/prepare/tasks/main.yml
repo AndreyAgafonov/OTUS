@@ -33,5 +33,10 @@
   hostname:
     name: "{{ hostname }}.{{ domain }}"
 
+- name: PREPARE | Disable SELinux
+  selinux:
+    state: disabled
 
+- name: PREPARE | Disable SELinux now
+  command: setenforce 0
 ...

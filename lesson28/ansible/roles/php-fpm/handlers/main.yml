@@ -1,0 +1,11 @@
+---
+- name: restart_nginx
+  systemd:
+    name: nginx
+    state: restarted
+
+- name: restart_php-fpm
+  systemd:
+    name: php-fpm
+    state: restarted
+...

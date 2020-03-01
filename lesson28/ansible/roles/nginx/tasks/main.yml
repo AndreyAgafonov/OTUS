@@ -1,9 +1,18 @@
 ---
-# tasks file for nginx
+- name: NGINX | Add nginx repo
+  yum_repository:
+      name: nginx_stable_repo
+      baseurl:  http://nginx.org/packages/centos/$releasever/$basearch/
+      gpgcheck: yes
+      enabled: yes
+      description: Official nginx stable repo
+      gpgkey: https://nginx.org/keys/nginx_signing.key
+
 - name: NGINX | Install packages
   yum:
     name: "{{ item }}"
     state: latest
+    update_cache: yes
   loop:
   - "{{ nginx_pakages }}"
   notify:
@@ -12,20 +21,5 @@
     - nginx-package
     - packages
 
-- name: NGINX | Create NGINX config file from template
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    #/etc/nginx/nginx.conf
-    mode: 0644
-    owner: root
-    group: root
-  with_items:
-    - { src: php-fpm.conf.j2 , dest: "{{ conf_path }}php-fpm.conf" }
-    - { src: python.conf.j2 , dest: "{{ conf_path }}python.conf" }
-    - { src: js.conf.j2 , dest: "{{ conf_path }}js.conf" }
-  notify:
-    - restart_nginx
-  tags:
-    - nginx-configuration
+
 

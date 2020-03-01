@@ -1,0 +1,40 @@
+# Upstream to backend connection(s) for php
+upstream php {
+        server unix:{{ php_unix_socket_path }}{{ php_unix_socket_file }};
+        #server 127.0.0.1:9000;
+}
+
+server {
+        server_name wordpress.{{ domain }};
+        listen {{ wordpress_port }};
+        root {{ wordpress_path }};
+        index index.php;
+
+
+        location = /favicon.ico {
+                log_not_found off;
+                access_log off;
+        }
+
+        location = /robots.txt {
+                allow all;
+                log_not_found off;
+                access_log off;
+        }
+
+        location / {
+                try_files $uri $uri/ /index.php?$args;
+        }
+
+        location ~ \.php$ {
+                #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+                include fastcgi_params;
+                fastcgi_intercept_errors on;
+                fastcgi_pass php;
+        }
+
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                expires max;
+                log_not_found off;
+        }
+}

@@ -9,4 +9,5 @@ prepare_pakages:
     - lsof
     - mc
     - curl
+    - yum-utils
 ...
