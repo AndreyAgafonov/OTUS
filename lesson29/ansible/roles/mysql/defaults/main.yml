@@ -1,0 +1,13 @@
+---
+# defaults file for mysql
+mysql_sock: /var/lib/mysql/mysql.sock
+mysql_login: root
+mysql_password: "X7TKK1Ze{1"
+
+temp_src_file_dump: /tmp/dump.sql
+temp_dst_file_dump: /tmp/dump.sql
+
+repl_db: bet
+repl_user: repl
+repl_password: "81QxqbKV[U"
+repl_host: "%"

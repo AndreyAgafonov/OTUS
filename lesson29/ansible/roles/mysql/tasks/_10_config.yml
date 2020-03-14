@@ -1,0 +1,20 @@
+---
+- name: Get startup password
+  shell:  "cat /var/log/mysqld.log | grep 'root@localhost:' | awk '{print $11}'"
+  register: mysql_old_pswd
+
+- name: Change root password
+  shell: mysql -u root -p'{{ mysql_old_pswd.stdout }}'  -NBe 'ALTER USER root@localhost IDENTIFIED BY "{{ mysql_password }}";' --connect-expired-password
+
+- name: allow connect user root from ansible host
+  shell: mysql -u root -p'{{ mysql_password }}'  -NBe 'GRANT ALL PRIVILEGES ON *.* TO root@"%" IDENTIFIED BY "{{ mysql_password }}" WITH GRANT OPTION;'
+
+- name: install .my.cnf to root user
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: wheel
+    mode: '0644'
+  with_items:
+    - { src: .my.cnf.j2, dest: "/root/.my.cnf", owner: root }

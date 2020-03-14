@@ -1,0 +1,27 @@
+---
+- name: Delivevy dump databse
+  copy:
+    src: "{{ temp_src_file_dump }}"
+    dest: "{{ temp_dst_file_dump }}"
+    owner: root
+    group: wheel
+    mode: '0644'
+
+- name: Change master for slave
+  mysql_replication:
+    mode: changemaster
+    master_host: 192.168.11.120
+    master_port: 3306
+    master_user: "{{ repl_user }}"
+    master_password: "{{ repl_password }}"
+    master_auto_position: 1
+
+#- name: change master for slave
+#  command: mysql -u root -p'{{ mysql_password }}'  -NBe  'CHANGE MASTER TO MASTER_HOST="192.168.11.120", MASTER_PORT=3306, MASTER_USER="{{ repl_user }}", MASTER_PASSWORD="{{ repl_password }}", MASTER_AUTO_POSITION=1;'
+
+- name: Start slave
+  mysql_replication:
+    mode: startslave
+
+#- name: start slave
+#  command: mysql -u root -p'{{ mysql_password }}'  -NBe  'START SLAVE;'
