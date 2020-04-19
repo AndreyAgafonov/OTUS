@@ -27,7 +27,7 @@ OTUS
 - [X] [Lesson 24 развернуть базу из дампа и настроить репликацию](lesson29)
 - [ ] Lesson 25 mysql cluster
 - [ ] Lesson 26 установка почтового сервера
-- [ ] Lesson 27 PostgreSQL
+- [ ] [Lesson 27 PostgreSQL](lesson32)
 - [ ] Lesson 28 Vagrant стенд для NFS или SAMBA
 - [ ] Lesson 29 Проектная работа
 
