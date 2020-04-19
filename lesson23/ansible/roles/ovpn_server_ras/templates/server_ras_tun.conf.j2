@@ -1,0 +1,21 @@
+port 1203
+proto tcp
+tls-server
+dev tun2
+topology subnet
+server 10.123.18.0 255.255.255.0
+keepalive 10 120
+persist-tun
+persist-key
+verb 3
+mute 20
+dh {{ OpenVPN_server_config_path }}{{ OpenVPN_ras_DH_filename }}
+ca {{ pki_certs_path }}{{ CA_cert_name }}
+cert {{ pki_certs_path }}{{ OpenVPN_cert_name }}
+key {{ pki_private_path }}{{ OpenVPN_private_key_name }}
+plugin /usr/lib64/openvpn/plugins/openvpn-plugin-auth-pam.so login
+
+#ifconfig-pool-persist ipp.txt
+#client-config-dir ccd
+#status /var/log/openvpn/openvpn-status.log 4
+#log-append  /var/log/openvpn/openvpn.log

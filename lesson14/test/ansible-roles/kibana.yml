@@ -1,0 +1,10 @@
+---
+  - name: lesson 14
+    hosts: kibana
+    become: true
+    gather_facts: True
+
+
+    roles:
+      - kibana
+

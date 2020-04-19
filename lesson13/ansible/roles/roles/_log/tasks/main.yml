@@ -1,0 +1,39 @@
+---
+# tasks file for Kibana
+  - name: LOG_SERVER2 | Install systemd-journal-gateway
+    yum:
+     name: systemd-journal-gateway
+     state: latest
+    tags: 
+      - Install systemd-journal-gateway
+
+  - name: LOG_SERVER2 | Create a Dir for  Journal-remote
+    file:
+      path: /var/log/journal/remote
+      state: directory
+      owner: systemd-journal-remote
+      group: systemd-journal-remote
+      mode: '0744'
+    tags:
+      - create dir
+
+  - name: LOG_SERVER2 | Mod Storage /etc/systemd/journald.conf
+    replace:
+      path: /etc/systemd/journald.conf
+      regexp: '^#Storage=auto'
+      replace: "Storage=persistent"
+
+  - name: LOG_SERVER2 | Change HTTPS protocol to HTTP (becouse this is tests)
+    replace:
+      path: /lib/systemd/system/systemd-journal-remote.service
+      regexp: "{{ item.regexp }}"
+      replace: "{{ item.replace }}"
+      whith_items:
+        - { regexp: 'listen-https', replace: "listen-http"}
+        - { regexp: '^WatchdogSec=10min', replace: "WatchdogSec=30" }
+    notify:
+      - restart journald
+    tags:
+      - https-http
+
+  

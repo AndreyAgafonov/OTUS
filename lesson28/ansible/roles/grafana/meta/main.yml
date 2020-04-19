@@ -1,0 +1,7 @@
+galaxy_info:
+  author: Agafonov Andrey
+  description: Deploy grafana
+  company: cloud16.ru
+  min_ansible_version: 2.9
+dependencies:
+  - prepare

@@ -1,0 +1,42 @@
+---
+- name: PREPARE | install epel-release
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - epel-release
+
+- name: PREPARE | install packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+  - "{{ prepare_pakages }}"
+  tags:
+    - prepare-package
+    - packages
+
+
+- name: PREPARE | set timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name: PREPARE | enable ntpd
+  systemd:
+    name: ntpd
+    state: started
+    enabled: true
+  notify: restart_ntpd
+
+- name: PREPARE | set hostname
+  hostname:
+    name: "{{ hostname }}.{{ domain }}"
+
+- name: PREPARE | Disable SELinux
+  selinux:
+    state: disabled
+
+- name: PREPARE | Disable SELinux now
+  command: setenforce 0
+...

@@ -1,0 +1,74 @@
+---
+
+- name:  OpenVPN Server RAS | Generate an OpenSSL private key for OpenVPN RAS server
+  openssl_privatekey:
+    path: "{{ pki_private_path }}{{ OpenVPN_ras_private_key_name }}"
+    size: "{{ OpenVPN_private_key_bits }}"
+
+- name:  OpenVPN Server RAS | Generate an OpenSSL CSR for OpenVPN RAS server
+  openssl_csr:
+    path: "{{ pki_certs_path }}{{ OpenVPN_ras_private_key_name }}.csr"
+    privatekey_path: "{{ pki_private_path }}{{ OpenVPN_ras_private_key_name }}"
+    country_name: "{{ OpenVPN_country_name }}"
+    organization_name: "{{ OpenVPN_org_name }}"
+    email_address: "{{ OpenVPN_email_addr }}"
+    common_name: "{{ OpenVPN_common_name }}"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+
+- name:  OpenVPN Server RAS | Generate server certificate
+  openssl_certificate:
+    subject:
+      CN: "{{ OpenVPN_common_name }}"
+    path: "{{ pki_certs_path }}{{ OpenVPN_ras_cert_name }}"
+    privatekey_path: "{{ pki_private_path }}{{ OpenVPN_ras_private_key_name }}"
+    csr_path: "{{ pki_certs_path }}{{ OpenVPN_ras_private_key_name }}.csr"
+    ownca_path: "{{ pki_certs_path }}{{ CA_cert_name }}"
+    ownca_privatekey_path: "{{ pki_private_path }}{{ CA_private_key_name }}"
+    provider: ownca
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_strict: true
+    extended_key_usage:
+      - clientAuth
+    extended_key_usage_strict: true
+
+- name:  OpenVPN Server RAS | install openvpn
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - openvpn
+    - easy-rsa
+    - libselinux-python
+    - policycoreutils-python
+
+- name:  OpenVPN Server RAS | Create logs directory
+  file:
+    path: "{{ log_dir }}"
+    state: directory
+
+- name:  OpenVPN Server RAS | generate DH
+  openssl_dhparam:
+    path: "{{ OpenVPN_server_config_path }}{{ OpenVPN_ras_DH_filename }}"
+    size: "{{ OpenVPN_DH_size }}"
+
+- name:  OpenVPN Server RAS | install config
+  template:
+    backup: true
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: server_ras_tun.conf.j2, dest: "{{ OpenVPN_server_config_path }}server_ras.conf" }
+
+- name:  OpenVPN Server RAS | enable and start openvpn-server@server_ras
+  systemd:
+    name: openvpn-server@server_ras
+    enabled: true
+  notify: restart_openvpn-server@server_ras
+...

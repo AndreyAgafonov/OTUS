@@ -1,0 +1,10 @@
+[barman]
+barman_user = {{ barman.username }}
+configuration_files_directory = /etc/barman.d
+barman_home = {{ barman.home }}
+log_file = /var/log/barman/barman.log
+log_level = INFO
+compression = gzip
+path_prefix = /usr/pgsql-11/bin
+retention_policy = RECOVERY WINDOW OF 2 WEEKS
+wal_retention_policy = main

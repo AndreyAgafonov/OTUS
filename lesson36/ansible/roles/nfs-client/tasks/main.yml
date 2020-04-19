@@ -1,0 +1,36 @@
+---
+- name:  NFS-CLIENT | Prepare for install NFS
+  yum:
+      name: "{{ packages }}"
+  vars:
+    packages:
+      - nfs-utils
+
+
+- name:  NFS-CLIENT | Create data folder
+  file:
+    path: "{{ mntfolder }}"
+    state: directory
+    mode: '0755'
+
+- name:  NFS-CLIENT | Enable NFS Server
+  systemd:
+    state: started
+    name: "{{ item }}"
+    enabled: yes
+  with_items:
+    - rpcbind
+    - nfs-server
+    - nfs-lock
+    - nfs-idmap
+
+- name:  NFS-CLIENT | add config for automount on boot
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ item }}"
+  with_items:
+    - "{{ nfsserver_host }}:{{ datafolder }}  {{ mntfolder }} nfs auto,nofail,proto=udp,vers=3,noatime,nolock,intr,tcp,actimeo=1800 0 2"
+
+- name:  NFS-CLIENT | mount folder
+  shell: mount -a
+

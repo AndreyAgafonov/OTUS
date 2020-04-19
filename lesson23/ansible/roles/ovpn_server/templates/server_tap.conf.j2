@@ -1,0 +1,16 @@
+port 1201
+proto udp
+dev tap1
+topology subnet
+server 10.123.16.0 255.255.255.0
+client-to-client
+keepalive 10 120
+persist-tun
+persist-key
+verb 3
+mute 20
+dh {{ OpenVPN_server_config_path }}{{ OpenVPN_DH_filename }}
+ca {{ pki_certs_path }}{{ CA_cert_name }}
+cert {{ pki_certs_path }}{{ OpenVPN_cert_name }}
+key {{ pki_private_path }}{{ OpenVPN_private_key_name }}
+

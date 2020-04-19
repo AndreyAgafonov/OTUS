@@ -1,0 +1,12 @@
+---
+# defaults file for nginx
+wordpress_link: https://ru.wordpress.org/
+wordpress_filename: latest-ru_RU.tar.gz
+wordpress_path: /opt/
+domain: cloud16.ru
+wordpress_port: 8081
+
+
+nginx_conf_path: /etc/nginx/
+php_unix_socket_path: /var/run/php-fpm/
+php_unix_socket_file: php-fpm.socket

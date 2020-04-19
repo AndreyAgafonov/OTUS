@@ -1,0 +1,53 @@
+---
+# tasks file for nginx
+ - name: NGINX | Install nginx Repo
+   block:
+    - name: Install Repo ELEL-Release
+      yum:
+        name: epel-release
+        state: present
+      tags:
+        - epel-package
+        - packages
+
+    - name: NGINX | Install packages
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop:
+      - "{{ nginx_pakages }}"
+      notify:
+        - restart nginx
+      tags:
+        - nginx-package
+        - packages
+
+    - name: NGINX | Create NGINX config file from template
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        mode: 0644
+        owner: root
+        group: root
+      notify:
+        - reload nginx
+      tags:
+        - nginx-configuration
+    
+    - name: NGINX| delivery home page
+      template:
+        src: ./files/index.html
+        dest: "{{ nginx_root_dir }}"
+        mode: 0644
+        owner: nginx
+        group: nginx
+      notify: 
+        - reload nginx
+      tags: 
+        - nginx-configuration
+    - name: NGINX| start service
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
+   when: ansible_facts['distribution'] == 'CentOS'

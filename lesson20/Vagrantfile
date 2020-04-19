@@ -1,0 +1,307 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+# шпаргалка для себя
+#- inetRouter
+#  - Сеть 192.168.255.0/30 router-net
+#- inetRouter2
+#  - Сеть 192.168.255.12/30 router-net
+#- centralRouter
+#   - Сеть 192.168.255.0/30 router-net
+#   - Сеть 192.168.0.0/28 - dir-net
+#   - Сеть 192.168.0.32/28 - hw-net
+#   - Сеть 192.168.0.64/26 - mgt-net
+#   - Сеть 192.168.255.4/30 - hw-net
+#   - Сеть 192.168.255.8/30 - mgt-net
+#   - Сеть 192.168.255.12/30 - router-net
+#- centralServer
+#   - Сеть  192.168.0.0/28 dir-net
+#- office1Router
+#   - Сеть 192.168.255.4 - hw-net
+#   - Сеть 192.168.2.0/26 - office1-dev
+#   - Сеть 192.168.2.64/26 - office1-test servers
+#   - Сеть 192.168.2.128/26 - office1-managers
+#   - Сеть 192.168.2.192/26 - office1-hardware
+#- office2Router
+#   - Сеть 192.168.255.8/30 - mgt-net
+#   - Сеть 192.168.1.0/25 - office2-dev
+#   - Сеть 192.168.1.128/26 - office2-test-servers
+#   - Сеть 192.168.1.192/26 - office2-hardware
+#- office1Server
+#   - Сеть 192.168.2.0/26 -office1-dev
+#- office2Server
+#   - Сеть 192.168.1.0/25 - office2-dev
+
+MACHINES = {
+:inetRouter => {
+        :box_name => "centos/6",
+        #:public => {:ip => '10.10.10.1', :adapter => 1},
+        :net => [
+                   {ip: '192.168.255.1', adapter: 2, netmask: "255.255.255.252", virtualbox__intnet: "router-net"},
+                ]
+  },
+
+  :inetRouter2 => {
+        :box_name => "centos/7",
+        :net => [
+                   {ip: '192.168.11.130', adapter: 3, netmask: "255.255.255.0"},
+                   {ip: '192.168.255.14', adapter: 2, netmask: "255.255.255.252", virtualbox__intnet: "router-net"},
+                ],
+        :ip_addr => '192.168.11.130',
+  },
+  
+  :centralRouter => {
+        :box_name => "centos/7",
+        :net => [
+                   {ip: '192.168.255.2', adapter: 2, netmask: "255.255.255.252", virtualbox__intnet: "router-net"},
+                   {ip: '192.168.0.1', adapter: 3, netmask: "255.255.255.240", virtualbox__intnet: "dir-net"},
+                   {ip: '192.168.0.33', adapter: 4, netmask: "255.255.255.240", virtualbox__intnet: "hw-net"},
+                   {ip: '192.168.0.65', adapter: 5, netmask: "255.255.255.192", virtualbox__intnet: "mgt-net"},
+                ]
+  },  
+  :centralServer => {
+        :box_name => "centos/7",
+        :net => [
+                   {ip: '192.168.0.2', adapter: 2, netmask: "255.255.255.240", virtualbox__intnet: "dir-net"},
+                   {adapter: 3, auto_config: false, virtualbox__intnet: true},
+                   {adapter: 4, auto_config: false, virtualbox__intnet: true},
+                ]
+  },
+###########
+  :office1Router => {
+        :box_name => "centos/7",
+        :net => [
+                   {ip: '192.168.2.1', adapter: 2, netmask: "255.255.255.192", virtualbox__intnet: "office1-dev"},
+                   {ip: '192.168.2.65', adapter: 3, netmask: "255.255.255.192", virtualbox__intnet: "office1-test servers"},
+                   {ip: '192.168.2.129', adapter: 4, netmask: "255.255.255.192", virtualbox__intnet: "office1-managers"},
+                   {ip: '192.168.2.193', adapter: 5, netmask: "255.255.255.192", virtualbox__intnet: "office1-hardware"},
+                   {ip: '192.168.255.6', adapter: 6, netmask: "255.255.255.252", virtualbox__intnet: "hw-net"},
+                ]
+  },
+
+  :office2Router => {
+    :box_name => "centos/7",
+    :net => [
+               {ip: '192.168.1.1', adapter: 2, netmask: "255.255.255.128", virtualbox__intnet: "office2-dev"},
+               {ip: '192.168.1.129', adapter: 3, netmask: "255.255.255.192", virtualbox__intnet: "office2-test-servers"},
+               {ip: '192.168.1.193', adapter: 4, netmask: "255.255.255.192", virtualbox__intnet: "office2-hardware"},
+               {ip: '192.168.255.10', adapter: 5, netmask: "255.255.255.252", virtualbox__intnet: "mgt-net"},
+            ]
+},
+
+:office1Server => {
+  :box_name => "centos/7",
+  :net => [
+             {ip: '192.168.2.2', adapter: 2, netmask: "255.255.255.192", virtualbox__intnet: "office1-dev"},
+
+          ]
+},
+
+:office2Server => {
+  :box_name => "centos/7",
+  :net => [
+             {ip: '192.168.1.2', adapter: 2, netmask: "255.255.255.128", virtualbox__intnet: "office2-dev"},
+          ]
+},
+:ansible => { #must be last
+  :box_name => "centos/7",
+  :net => [
+     { ip: '192.168.0.3', adapter: 2, netmask: "255.255.255.240", virtualbox__intnet: "dir-net"},
+     { ip: '192.168.11.100', adapter: 3, netmask: "255.255.255.0"},
+    ],
+  :ip_addr => '192.168.11.100',
+  :machine_cpu => '1',
+  :machine_memory => '1024',
+}
+}
+
+Vagrant.configure("2") do |config|
+
+  MACHINES.each do |boxname, boxconfig|
+
+    config.vm.define boxname do |box|
+
+        box.vm.box = boxconfig[:box_name]
+        box.vm.host_name = boxname.to_s
+
+        boxconfig[:net].each do |ipconf|
+          box.vm.network "private_network", ipconf
+        end
+        
+        box.vm.provider :virtualbox do |vb|
+          vb.customize ["modifyvm", :id, "--memory", "256"]
+          vb.customize ["modifyvm", :id, "--cpus", "1"]
+          vb.name = boxname.to_s
+          end
+
+        if boxconfig.key?(:public)
+          box.vm.network "public_network", boxconfig[:public]
+        end
+
+        box.vm.provision "shell", inline: <<-SHELL
+        bash +x /vagrant/provision.sh
+        SHELL
+        
+        case boxname.to_s
+        when "inetRouter"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            iptables -t nat -A POSTROUTING ! -d 192.168.0.0/16 -o eth0 -j MASQUERADE
+            #взял намеренно больше чем требуется - хотя правильно было бы описать по отдельности 3 сети /24 и 2 подсети /30. т.к. у меня глобализация захватывает бОльший диапазон 
+            #что может привести к не правильной маршрутизации при дальнейшем расщирении сети. Было лень :).
+            ip route add 192.168.0.0/22 via 192.168.255.2 dev eth1
+            ip route add 192.168.255.0/27 via 192.168.255.2 dev eth1
+
+            # port knocking - 3333 9965 22 - 30 sec
+            # разрешим соединения со статусом est и rel в conntracker
+            iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+            
+            # разрешим icmp
+            iptables -A INPUT -p icmp --icmp-type any -j ACCEPT
+            
+            # создадим цепочку для port knocking
+            iptables -N SSH_KNOCK
+            
+            # сделаем переход из input в цепочку для port knocking
+            iptables -A INPUT -j SSH_KNOCK
+            
+            # заранее создадим цепочку для SSH SET
+            iptables -N SSH_SET
+            
+            # если наш хост есть в списке SSH_STEP2 не более, чем 30 секунд, то пускаем...
+            iptables -A SSH_KNOCK -m state --state NEW -m tcp -p tcp -m recent --rcheck --seconds 30 --dport 22 --name SSH_STEP2 -j ACCEPT
+            
+            # удаляем его из списка (> 30 секунд)
+            iptables -A SSH_KNOCK -m state --state NEW -m tcp -p tcp -m recent --name SSH_STEP2 --remove -j DROP
+            
+            # если наш хост стучался по порту 9965 и был в списке SSH_STEP1 не более 30 сек --->
+            iptables -A SSH_KNOCK -m state --state NEW -m tcp -p tcp -m recent --rcheck --second 10 --dport 9965 --name SSH_STEP1 -j SSH_SET
+            
+            # >--- то включить его в список SSH_STEP2
+            iptables -A SSH_SET -m recent --set --name SSH_STEP2 -j DROP
+            
+            # ... иначе - удалить из списка SSH_STEP1
+            iptables -A SSH_KNOCK -m state --state NEW -m tcp -p tcp -m recent --name SSH_STEP1 --remove -j DROP
+            
+            # если хост стучится по порту 3333, то добавить его в список SSH_STEP1
+            iptables -A SSH_KNOCK -m state --state NEW -m tcp -p tcp -m recent --set --dport 3333 --name SSH_STEP1 -j DROP
+            
+            # по-умолчанию DROP внутри port knocking
+            iptables -A SSH_KNOCK -j DROP
+            
+            # по-умолчанию DROP на 22 порту со стороны, откуда будет идти проверка (по умолчанию желательно что бы политика по умолчанию была DROP, но в условиях стенда, 
+            # что бы не блокировать остальной трафик закртываю только 22 порт.)
+            iptables -A INPUT -i eth1 -p tcp --dport 22 -j DROP
+
+
+            SHELL
+
+        when "inetRouter2"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            #добавляем правило для DNAT - если на внешнем интерфейсе есть образение на 80 порту то перенаправляем трафик на centralrouter на порт 8080
+            iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 80 -j DNAT --to-destination 192.168.255.13:8080
+            # ... и для корректного ответа подменяем адрес источника запроса на адрес маршрутизатора
+            iptables -t nat -A POSTROUTING -o eth1 -p tcp --dport 8080 -d 192.168.255.13 -j SNAT --to-source 192.168.255.14
+            #взял намеренно больше чем требуется - хотя правильно было бы описать по отдельности 3 сети /24 и 2 подсети /30. т.к. у меня глобализация захватывает бОльший диапазон 
+            #что может привести к не правильной маршрутизации при дальнейшем расщирении сети. Было лень :).
+            ip route add 192.168.0.0/22 via 192.168.255.2 dev eth1 2>&1 >/dev/null || true
+            ip route add 192.168.255.0/27 via 192.168.255.2 dev eth1 2>&1 >/dev/null || true
+			
+          SHELL
+
+        when "centralRouter"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            ip route delete default 2>&1 >/dev/null || true
+            ip route add default via 192.168.255.1 dev eth1  2>&1 >/dev/null || true
+            #route to IRouter2
+            ip address add 192.168.255.13/30 dev eth1:1
+            ip link set eth1:1 up
+            #ip route add 192.168.2.0/24 via 192.168.255.6 dev eth1:1
+            #route to office1
+            ip address add 192.168.255.5/30 dev eth3:1
+            ip link set eth3:1 up
+            ip route add 192.168.2.0/24 via 192.168.255.6 dev eth3:1
+            #route to office2
+            ip a add 192.168.255.9/30 dev eth4:1
+            ip link set eth4:1 up
+            ip route add 192.168.1.0/24 via 192.168.255.10 dev eth4:1
+            SHELL
+
+        when "centralServer"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+            echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
+            systemctl restart network
+            SHELL
+
+        when "office1router"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+            echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
+            systemctl restart network
+            SHELL
+        when "office1server"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+            echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
+            systemctl restart network
+            SHELL
+        when "office2router"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            echo "DEFROUTE=no" >> /etc/sysconfig/network-scripts/ifcfg-eth0 
+            echo "GATEWAY=192.168.0.1" >> /etc/sysconfig/network-scripts/ifcfg-eth1
+            systemctl restart network
+            SHELL
+        when "office2server"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            ip route delete default 2>&1 >/dev/null || true
+            ip r add default via 192.168.0.1 dev eth1
+            SHELL
+
+        when "office1Router"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            ip route delete default 2>&1 >/dev/null || true
+            ip r add default via 192.168.255.5 dev eth5  2>&1 >/dev/null || true
+            SHELL
+
+        when "office2Router"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            sysctl net.ipv4.conf.all.forwarding=1
+            ip route delete default 2>&1 >/dev/null || true
+            ip r add default via 192.168.255.9 dev eth4  2>&1 >/dev/null || true
+            SHELL
+
+        when "office1Server"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            ip route delete default 2>&1 >/dev/null || true
+            ip r add default via 192.168.2.1 dev eth1  2>&1 >/dev/null || true
+            SHELL
+
+        when "office2Server"
+          box.vm.provision "shell", run: "always", inline: <<-SHELL
+            ip route delete default 2>&1 >/dev/null || true
+            ip r add default via 192.168.1.1 dev eth1  2>&1 >/dev/null || true
+            SHELL
+
+        when "ansible"
+          provision_path = './' + boxname.to_s
+          provision_script = provision_path +  '/provision.sh'
+          provision_work_dir= '/vagrant/' + boxname.to_s
+          provision_box_name= boxname.to_s
+          box.vm.provision "shell", run: "always", path: provision_script
+
+        end
+
+      end
+
+  end
+  
+  
+end

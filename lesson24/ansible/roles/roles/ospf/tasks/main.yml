@@ -1,0 +1,71 @@
+---
+- name: Sysctl  activate forwarding
+  sysctl:
+    name: "{{ item }}"
+    value: "1"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - "net.ipv6.conf.all.disable_ipv6"
+    - "net.ipv6.conf.default.disable_ipv6"
+    - "net.ipv4.conf.all.forwarding"
+    - "net.ipv4.ip_forward"
+
+
+- name: net.ipv4.conf.all.rp_filter to /etc/sysctl.conf
+  sysctl:
+    name: "{{ item }}"
+    value: "2"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - "net.ipv4.conf.all.rp_filter"
+
+- name: Add repository epel-release
+  yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+
+- name: Install require dependencies
+  yum:
+    name: https://ci1.netdef.org/artifact/LIBYANG-YANGRELEASE/shared/build-10/CentOS-7-x86_64-Packages/libyang-0.16.111-0.x86_64.rpm
+    state: present
+
+- name: FRR install
+  yum:
+    name: https://github.com/FRRouting/frr/releases/download/frr-7.2/frr-7.2-01.el7.centos.x86_64.rpm
+    state: present
+
+- name: ospfd provision from template
+  template:
+    backup: true
+    owner: frr
+    group: frrvty
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: ospfd.conf.j2, dest: "/etc/frr/ospfd.conf" }
+
+- name : add other route to ospfd (only for router3)
+  lineinfile:
+    path: /etc/frr/ospfd.conf
+    line: "{{ item }}"
+  with_items:
+      - { network 172.16.0.0/12 area 0 }
+      - { no passive-interface eth3 }
+  when: hostname == "router3"
+
+- name: frr activate ospfd
+  replace:
+    path: /etc/frr/daemons
+    regexp: 'ospfd=no'
+    replace: 'ospfd=yes'
+
+- name: ospfd enabled in systemd
+  systemd:
+    name: frr
+    enabled: true
+    state: restarted

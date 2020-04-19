@@ -1,0 +1,31 @@
+---
+- name: PREPARE |Install epel-release
+  yum:
+    name: "{{ repos }}"
+    state: present
+  vars:
+    repos:
+    - epel-release
+
+- name: PREPARE |Install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ prepare_pakages }}"
+
+- name: PREPARE |Set timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name: PREPARE |Enable ntpd
+  systemd:
+    name: ntpd
+    enabled: true
+    state: restarted
+
+- name: PREPARE |Set Hostname
+  hostname:
+    name: "{{ role_hostname }}.{{ domain }}"
+
+...

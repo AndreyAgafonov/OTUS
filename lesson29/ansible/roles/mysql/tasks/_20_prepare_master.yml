@@ -1,0 +1,44 @@
+---
+- name: Create BD {{ repl_db }}
+  mysql_db:
+    name:
+        - "{{ repl_db }}"
+    state: present
+    login_unix_socket: "{{ mysql_sock }}"
+
+- name: Restore DB {{ repl_db }} from dump
+  mysql_db:
+    name:
+        - "{{ repl_db }}"
+    state: import
+    login_unix_socket: "{{ mysql_sock }}"
+    target: /vagrant/ansible/roles/mysql/files/bet.dmp
+    #shell: mysql -uroot -p'{{ mysql_password }}' -D bet < /vagrant/ansible/roles/mysql/files/bet.dmp
+
+- name: Create user "{{ repl_user}}" for replication
+  mysql_user:
+    name: "{{ repl_user }}"
+    host: "{{ repl_host }}"
+    password: "{{ repl_password }}"
+    priv: '*.*:REPLICATION SLAVE'
+    state: present
+
+- name: Dump all databases to {{ temp_dst_file_dump }}
+  mysql_db:
+    state: dump
+    name: all
+    target: /tmp/dump.sql
+    ignore_tables:
+        - bet.events_on_demand
+        - bet.v_same_event
+
+
+
+#- name: Dump databases shell
+#  shell: mysqldump --all-databases --triggers --routines --master-data --ignore-table=bet.events_on_demand --ignore-table=bet.v_same_event > "{{ temp_dst_file_dump }}"
+
+- name: Get dump
+  fetch:
+    src: "{{ temp_dst_file_dump }}"
+    dest: "{{ temp_src_file_dump }}"
+    flat: yes

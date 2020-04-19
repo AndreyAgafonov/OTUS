@@ -1,0 +1,60 @@
+- name: "Шаблоны для настройки bonda"
+  template:
+    backup: true
+    owner: root
+    group: root
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: ifcfg-eth-1.j2, dest: "/etc/sysconfig/network-scripts/ifcfg-{{ bond_config_device_1 }}" }
+    - { src: ifcfg-eth-2.j2, dest: "/etc/sysconfig/network-scripts/ifcfg-{{ bond_config_device_2 }}" }
+    - { src: ifcfg-bond.j2, dest: "/etc/sysconfig/network-scripts/ifcfg-{{ bond_device }}" }
+  notify: restart_network
+
+- name: Конфигурирование ifcfg-{{ bond_config_device_1 }} - добавляем MAC адресс
+  lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ bond_config_device_1 }}"
+    line: "HWADDR={{ hostvars[inventory_hostname][item]['macaddress'] }}"
+    state: present
+  with_items:
+    - "ansible_{{ bond_config_device_1 }}"
+
+- name: Конфигурирование ifcfg-{{ bond_config_device_2 }} - добавляем MAC адресс
+  lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ bond_config_device_2 }}"
+    line: "HWADDR={{ hostvars[inventory_hostname][item]['macaddress'] }}"
+    state: present
+  with_items:
+    - "ansible_{{ bond_config_device_2 }}"
+
+
+- name: Добавляем маршрутизуцию которая ломается для настраиваемого интерфейса centralRouter
+  lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-{{ bond_device }}"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "DEFROUTE='yes'"
+    - "GATEWAY={{ centralrouter_gw }}"
+  when: ansible_facts['hostname'] == "centralRouter"
+
+- name: Убираю DEFROUTE маршрутизуцию с eth0 centralRouter
+  lineinfile:
+    path: "/etc/sysconfig/network-scripts/ifcfg-eth0"
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "DEFROUTE='no'"
+  when: ansible_facts['hostname'] == "centralRouter"
+
+- name: Добавляем маршрутизуцию которая ломается для настраиваемого интерфейса inetRouter
+  template:
+    backup: true
+    owner: root
+    group: root
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: inetRouter-route-bond.j2, dest: "/etc/sysconfig/network-scripts/route-{{ bond_device }}" }
+  when: ansible_facts['hostname'] == "inetRouter"
+...

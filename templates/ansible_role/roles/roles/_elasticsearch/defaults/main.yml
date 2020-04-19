@@ -1,0 +1,6 @@
+---
+# defaults file for elasticsearch
+  elasticsearch_work_dir: "{{ datadrive }}/elasticsearch"
+  elasticsearch_data: "{{ elasticsearch_work_dir }}/data"
+  elasticsearch_container_name: es01
+

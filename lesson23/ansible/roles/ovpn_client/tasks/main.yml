@@ -1,0 +1,113 @@
+---
+- name: OpenVPN Client |Generate an OpenSSL private key for OpenVPN client
+  openssl_privatekey:
+    path: "{{ pki_private_path }}{{ OpenVPN_client_private_key_name }}"
+    size: "{{ OpenVPN_private_key_bits }}"
+
+- name: OpenVPN Client |Generate an OpenSSL CSR for OpenVPN client
+  openssl_csr:
+    path: "{{ pki_certs_path }}{{ OpenVPN_client_private_key_name }}.csr"
+    privatekey_path: "{{ pki_private_path }}{{ OpenVPN_client_private_key_name }}"
+    country_name: "{{ OpenVPN_country_name }}"
+    organization_name: "{{ OpenVPN_org_name }}"
+    email_address: "{{ OpenVPN_email_addr }}"
+    common_name: "{{ OpenVPN_client_common_name }}"
+    key_usage:
+      - digitalSignature
+    extended_key_usage:
+      - clientAuth
+
+- name: OpenVPN Client |Fetch CSR file from client to localhost /tmp
+  fetch:
+    src: "{{ pki_certs_path }}{{ OpenVPN_client_private_key_name }}.csr"
+    dest: /tmp/
+
+
+- name: OpenVPN Client |Copy CSR file from localhost to server
+  copy:
+    src: "/tmp/{{ hostname }}/{{ pki_certs_path }}{{ OpenVPN_client_private_key_name }}.csr"
+    dest: "{{ pki_certs_path }}{{ OpenVPN_client_private_key_name }}.csr"
+  delegate_to: server
+
+- name: OpenVPN Client |Generate client certificate signed with my own CA certificate
+  delegate_to: server
+  openssl_certificate:
+    path: "{{ pki_certs_path }}{{ OpenVPN_client_cert_name }}"
+    csr_path: "{{ pki_certs_path }}{{ OpenVPN_client_private_key_name }}.csr"
+    ownca_path: "{{ pki_certs_path }}{{ CA_cert_name }}"
+    ownca_privatekey_path: "{{ pki_private_path }}{{ CA_private_key_name }}"
+    provider: ownca
+    key_usage:
+      - digitalSignature
+    key_usage_strict: true
+    extended_key_usage:
+      - clientAuth
+    extended_key_usage_strict: true
+
+- name: OpenVPN Client |Fetch certificate from server to localhost /tmp
+  fetch:
+    src: "{{ pki_certs_path }}{{ OpenVPN_client_cert_name }}"
+    dest: /tmp
+  delegate_to: server
+
+- name: OpenVPN Client |Copy certificate from localhost to client
+  copy:
+    src: "/tmp/{{ hostname }}/{{ pki_certs_path }}{{ OpenVPN_client_cert_name }}"
+    dest: "{{ pki_certs_path }}{{ OpenVPN_client_cert_name }}"
+
+- name: OpenVPN Client |Remove certificate from localhost /tmp
+  file:
+    path: "/tmp/{{ hostname }}/{{ pki_certs_path }}{{ OpenVPN_client_cert_name }}"
+    state: absent
+
+- name: OpenVPN Client |install openvpn
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - openvpn
+
+- name: OpenVPN Client |install config
+  template:
+    backup: true
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: client_tap.conf.j2, dest: "{{ OpenVPN_client_config_path }}client_tap.conf" }
+    - { src: client_tun.conf.j2, dest: "{{ OpenVPN_client_config_path }}client_tun.conf" }
+
+- name: OpenVPN Client |Fetch CA certificate from server to localhost /tmp
+  fetch:
+    src: "{{ pki_certs_path }}{{ CA_cert_name }}"
+    dest: /tmp
+  delegate_to: server
+
+- name: OpenVPN Client |Copy CA certificate from localhost to client
+  copy:
+    src: "/tmp/{{ hostname }}/{{ pki_certs_path }}{{ CA_cert_name }}"
+    dest: "{{ pki_certs_path }}{{ CA_cert_name }}"
+
+- name: OpenVPN Client |Remove CA certificate from localhost /tmp
+  file:
+    path: "/tmp/{{ hostname }}/{{ pki_certs_path }}{{ CA_cert_name }}"
+    state: absent
+
+
+- name: OpenVPN Client |enable and start openvpn-client@client_tun
+  systemd:
+    name: openvpn-client@client_tun
+    enabled: true
+  notify: restart_openvpn-client@client_tun
+
+- name: OpenVPN Client |enable and start openvpn-client@client_tap
+  systemd:
+    name: openvpn-client@client_tap
+    enabled: true
+  notify: restart_openvpn-client@client_tap
+
+- name: OpenVPN Client |Enable and start OpenVPN client (tun and tap)
+  debug:
+    msg:
+      - Deploy OpenVPN client on {{ inventory_hostname }}  has been completed
+...

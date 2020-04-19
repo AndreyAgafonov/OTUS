@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Andrey Agafonov
+  description: ovpn client Генерация сертификата и доставка его на машину
+  min_ansible_version: 2.9
+dependencies: []
+...

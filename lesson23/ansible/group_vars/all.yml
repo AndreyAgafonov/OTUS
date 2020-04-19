@@ -1,0 +1,34 @@
+---
+CA_cert_name: CA.crt
+CA_common_name: CA
+CA_country_name: RU
+CA_email_addr: admin@cloud16.ru
+CA_org_name: cloud16.ru
+CA_private_key_bits: 4096
+CA_private_key_name: CA.pem
+log_dir: /var/log/openvpn
+ntp_timezone: Europe/Moscow
+pki_certs_path: /etc/pki/CA/certs/
+pki_private_path: /etc/pki/CA/private/
+
+
+OpenVPN_cert_name: openvpn_server.crt
+OpenVPN_client_cert_name: openvpn_client.crt
+OpenVPN_client_config_path: /etc/openvpn/client/
+OpenVPN_client_private_key_name: openvpn_client.pem
+OpenVPN_DH_filename: dhparams.pem
+OpenVPN_DH_size: 1024
+OpenVPN_private_key_bits: 2048
+OpenVPN_private_key_name: openvpn_server.pem
+OpenVPN_ras_cert_name: openvpn_ras_server.crt
+OpenVPN_ras_client_cert_name: openvpn_ras_client.crt
+OpenVPN_ras_client_common_name: rasclient
+OpenVPN_ras_client_private_key_name: openvpn_ras_client.pem
+OpenVPN_ras_country_name: RU
+OpenVPN_ras_DH_filename: dhparams_ras.pem
+OpenVPN_ras_email_addr: admin@cloud16.ru
+OpenVPN_ras_org_name: cloud16.ru
+OpenVPN_ras_private_key_name: openvpn_ras_server.pem
+OpenVPN_server_config_path: /etc/openvpn/server/
+
+...

@@ -1,0 +1,155 @@
+---
+### Source http://docs.pgbarman.org/release/2.10/#installation-on-redhatcentos-using-rpm-packages
+- name: install packeges {{ master_hostname }}
+  include: 10_install_packeges.yml
+  delegate_to: "{{ master_hostname }}"
+
+- name: install packeges {{ backup_hostname }}
+  include: 10_install_packeges.yml
+  delegate_to: "{{ backup_hostname }}"
+
+- name: Check barman user
+  become_user: postgres
+  command: psql postgres -tAc "SELECT 1 from pg_roles where rolname='{{ barman.username }}'"
+  register: barman_user_exists
+  delegate_to: "{{ master_hostname }}"
+
+- name: Create barman user
+  become_user: postgres
+  when: barman_user_exists.stdout != "1"
+  command: psql postgres -c "CREATE USER {{ barman.username }} WITH SUPERUSER PASSWORD '{{ barman.password }}'"
+  delegate_to: "{{ master_hostname }}"
+
+- name: Check barman streaming user
+  become_user: postgres
+  command: psql postgres -tAc "SELECT 1 from pg_roles where rolname='{{ barman.streaming.username }}'"
+  register: barman_streaming_user_exists
+  delegate_to: "{{ master_hostname }}"
+
+- name: Create barman streaming user
+  become_user: postgres
+  when: barman_streaming_user_exists.stdout != "1"
+  command: psql postgres -c "CREATE USER {{ barman.streaming.username }} WITH REPLICATION PASSWORD '{{ barman.streaming.password }}'"
+  delegate_to: "{{ master_hostname }}"
+
+- name: Check barman replication slot
+  become_user: postgres
+  command: psql postgres -tAc "SELECT 1 from pg_replication_slots  where slot_name='{{ barman.slot }}'"
+  register: barman_slot_exists
+  delegate_to: "{{ master_hostname }}"
+
+- name: Create barman replication slot
+  become_user: postgres
+  command: psql postgres -c "SELECT * FROM pg_create_physical_replication_slot('{{ barman.slot }}');"
+  when: barman_slot_exists.stdout != "1"
+  delegate_to: "{{ master_hostname }}"
+
+- name: Copy templates barman
+  template:
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { owner: root , group: root , mode: '0644' , src: barman.conf.j2 , dest: "/etc/barman.conf" }
+    - { owner: root , group: root , mode: '0644' , src: barman.d.conf.j2 , dest: "/etc/barman.d/{{ master_hostname }}.{{ domain }}.conf" }
+    - { owner: barman , group: barman , mode: '0600' , src: ".pgpass.j2" , dest: "{{ barman.home }}/.pgpass"  }
+
+- name: Configuring {{ postgresql_data_path }}/pg_hba.conf on {{ master_hostname }}.{{ domain }}
+  lineinfile:
+    path: "{{ postgresql_data_path }}/pg_hba.conf"
+    line: "host all {{ barman.username }} {{ backup_ip }}/32 md5"
+    state: present
+  delegate_to: "{{ master_hostname }}"
+  notify: reload_postgresql_master
+
+- name: Configuring {{ postgresql_data_path }}/pg_hba.conf on {{ master_hostname }}.{{ domain }}
+  lineinfile:
+    path: "{{ postgresql_data_path }}/pg_hba.conf"
+    line: "host replication {{ barman.streaming.username }} {{ backup_ip }}/32 md5"
+    state: present
+  delegate_to: "{{ master_hostname }}"
+  notify: reload_postgresql_master
+
+- name: Replace archive command in {{ postgresql_data_path }}/postgresql.conf on {{ master_hostname }}.{{ domain }}
+  replace:
+    path: "{{ postgresql_data_path }}/postgresql.conf"
+    regexp: '^archive_command.*'
+    replace: "archive_command = 'barman-wal-archive {{ backup_hostname }}.{{ domain }} {{ master_hostname }}.{{ domain }} %p'"
+  delegate_to: "{{ master_hostname }}"
+  notify: reload_postgresql_master
+
+- name: Replace archive command in {{ postgresql_data_path }}/postgresql.conf on {{ replica_hostname }}.{{ domain }}
+  replace:
+    path: "{{ postgresql_data_path }}/postgresql.conf"
+    regexp: '^archive_command.*'
+    replace: "archive_command = 'barman-wal-archive {{ backup_hostname }}.{{ domain }} {{ replica_hostname }}.{{ domain }} %p'"
+  delegate_to: "{{ replica_hostname }}"
+  notify: reload_postgresql_replica
+
+####################### SSH  #######################
+- name: Prepare SSH keys for {{ master_hostname }}
+  include: 20_prepare_ssh_keys.yml
+  vars:
+    key: postgresql
+    user_1: "{{ postgresql.username }}"
+    user_2: "{{ barman.username }}"
+    ext_key_pub: barman
+  delegate_to: "{{ master_hostname }}"
+
+- name: Prepare SSH keys for {{ backup_hostname }}
+  include: 20_prepare_ssh_keys.yml
+  vars:
+    key: barman
+    user_1: "{{ postgresql.username }}"
+    user_2: "{{ barman.username }}"
+    ext_key_pub: postgresql
+  delegate_to: "{{ backup_hostname }}"
+
+####################### SSH  ssh-keyscan #######################
+### возиожно потребуется сделать loop
+- name: Add SSH fingerprints from {{ master_hostname }}.{{ domain }} to .ssh/known_hosts
+  include: 30_ssh_keyscan.yml
+  vars:
+    hostname_keyscan: "{{ backup_hostname }}"
+  delegate_to: "{{ master_hostname }}"
+
+- name: Add SSH fingerprints from {{ backup_hostname }}.{{ domain }} to .ssh/known_hosts
+  include: 30_ssh_keyscan.yml
+  vars:
+    hostname_keyscan: "{{ master_hostname }}"
+  delegate_to: "{{ backup_hostname }}"
+
+- name: Recursively change permissions of {{ postgresql_path }}
+  file:
+    path: "{{ postgresql_path }}/11"
+    state: directory
+    recurse: yes
+    mode: '0750'
+  delegate_to: "{{ master_hostname }}"
+
+#- name: Reload postgresql on {{ master_hostname }}.{{ domain }}
+#  systemd:
+#    name: postgresql-11.service
+#    state: reloaded
+#  delegate_to: "{{ master_hostname }}"
+#
+#- name: Reload postgresql on {{ replica_hostname }}.{{ domain }}
+#  systemd:
+#    name: postgresql-11.service
+#    state: reloaded
+#  delegate_to: "{{ replica_hostname }}"
+#
+#- name: Start WAL archivation from {{ master_hostname }}.{{ domain }}
+#  command: "barman switch-wal --archive {{ master_hostname }}.{{ domain }}"
+#  become: yes
+#  become_user: barman
+#  ignore_errors: true
+#
+#- name: Set WAL archivation into cron
+#  command: "barman cron"
+#  become: yes
+#  become_user: barman
+#  ignore_errors: true
+...

@@ -1,0 +1,17 @@
+---
+#- name: Run deploy nginx lesson 28 OTUS
+#  hosts: webserver
+#  become: true
+
+#  roles:
+#    - nginx
+#    - wordpress
+
+- name: Run deploy ghost
+  hosts: webserver
+  become: true
+
+  roles:
+    - ghost
+
+

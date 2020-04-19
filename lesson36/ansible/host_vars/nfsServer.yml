@@ -1,0 +1,4 @@
+---
+nfs_server_allow_host: 192.168.11.161
+
+...

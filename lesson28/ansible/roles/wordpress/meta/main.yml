@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  author: Andrey Agafonov
+  description: install nginx server
+  min_ansible_version: 2.9
+  galaxy_tags: [Dynamic content]
+
+dependencies:
+  - prepare
+  - php-fpm
+  - mysql

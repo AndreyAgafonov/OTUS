@@ -1,0 +1,44 @@
+---
+# tasks file for ghost
+- name: GHOST | Add user for Ghost
+  user:
+    name: "{{ ghost_user_name }}"
+    comment: user for ghost blog
+    #group: "{{ghost_user_name}}, wheel"
+
+
+- name: prepare - add Ghost group
+  group:
+    name: "{{ ghost_user_group }}"
+    system: yes
+    state: present
+  become: yes
+
+- name: prepare - add Ghost user
+  user:
+    name: "{{ ghost_user_name }}"
+    group: "{{ ghost_user_group }}"
+    home: "{{ ghost_user_home }}"
+    createhome: yes
+    shell: /bin/false
+    system: yes
+    state: present
+  become: yes
+
+- name: Add User {{ ghost_user_name }} to sudoers
+  lineinfile: dest=/etc/sudoers backup=yes state=present regexp=^{{ ghost_user_name }} insertafter="^#includedir /etc/sudoers.d" line="{{ ghost_user_name }} ALL=(ALL) NOPASSWD:ALL"
+
+- name: GHOST | Install ghost-CLI
+  command: sudo npm install ghost-cli@latest -g
+
+- name: GHOST | create work dir
+  file:
+    path: "{{ ghost_work_dir }}"
+    state: directory
+    owner: "{{ ghost_user_name }}"
+    group: "{{ ghost_user_name }}"
+    mode: '0775'
+
+- name: GHOST | Install ghost
+  become_user: "{{ ghost_user_name }}"
+  command: cd {{ ghost_work_dir }} && yes | ghost install

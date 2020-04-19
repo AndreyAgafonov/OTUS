@@ -1,0 +1,9 @@
+[vlan]
+testServer1
+testServer2
+testClient1
+testClient2
+
+[bond]
+inetrouter
+centralrouter

@@ -1,0 +1,2 @@
+[webserver]
+nginx1 ansible_host=192.168.11.110

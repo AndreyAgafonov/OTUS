@@ -1,0 +1,51 @@
+---
+### Source http://docs.pgbarman.org/release/2.10/#installation-on-redhatcentos-using-rpm-packages
+- name: Get barman repo-script from 2ndQuadrant
+  get_url:
+    url: https://dl.2ndquadrant.com/default/release/get/11/rpm
+    dest: /tmp/install_barman_repo.sh
+    mode: '0500'
+
+- name: Install barman-repo from script
+  command: /tmp/install_barman_repo.sh
+  args:
+    creates: /etc/yum.repos.d/barman-release-pg11.repo
+
+- name: Install barman
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - barman
+    - barman-cli
+
+# - name: Install barman whith pip3
+#   command: pip3 install barman
+
+# - name: replace wrong line in barman
+#   replace:
+#     path: /usr/bin/barman
+#     regexp: '^#!/usr/bin/python2'
+#     replace: '#!/usr/bin/python3'
+
+# - name: Install barman
+#   yum:
+#     name: "{{ packages }}"
+#     state: present
+#   vars:
+#     packages:
+#     - barman
+#     - barman-cli
+
+#   pip:
+#     name: "{{ packages }}"
+#     executable: pip3.6
+#   vars:
+#     packages:
+#     - psycopg2
+#     - barman
+#     - barman-cli
+
+
+

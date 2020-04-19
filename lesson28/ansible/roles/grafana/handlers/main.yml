@@ -1,0 +1,10 @@
+---
+# handlers file for grafana
+---
+- name: start_grafana
+  start_grafana:
+    name: grafana-server
+    daemon_reload: yes
+    state: started
+    enabled: yes
+...

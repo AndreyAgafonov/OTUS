@@ -1,0 +1,39 @@
+hostname {{ hostname }}
+!password zebra
+!
+!
+log stdout
+log file /var/log/frr/ospfd.log
+!
+!interface eth0
+!
+interface {{ vlanid_1_config_device }}
+ip ospf mtu-ignore
+ip ospf network broadcast
+!ip ospf network point-to-point
+ip ospf cost {{ vlanid_1_cost }}
+ip ospf hello-interval 5
+ip ospf dead-interval 10
+
+!
+interface {{ vlanid_2_config_device }}
+ip ospf mtu-ignore
+ip ospf network broadcast
+!ip ospf network point-to-point
+ip ospf cost {{ vlanid_2_cost }}
+ip ospf hello-interval 5
+ip ospf dead-interval 10
+
+!
+!interface lo
+!
+router ospf
+ospf router-id {{ loop_address }}
+passive-interface default
+no passive-interface vlanid_1_config_device
+no passive-interface vlanid_2_config_device
+network {{ vlanid_1_network }}/{{ vlanid_1_netmask }} area 0
+network {{ vlanid_2_network }}/{{ vlanid_2_netmask }} area 0
+!network {{ loop_address }}/{{ loop_netmask }} area {{ loop_area }}
+!
+

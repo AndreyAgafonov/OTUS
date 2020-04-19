@@ -1,0 +1,96 @@
+---
+####################### SSH  #######################
+- name: POSTGRES-REPLICATION |Prepare SSH keys for {{ master_hostname }}
+  include: 20_prepare_ssh_keys.yml
+  vars:
+    key: master
+    user_1: "{{ postgresql.username }}"
+    ext_key_pub: replica
+  delegate_to: "{{ master_hostname }}"
+
+- name: POSTGRES-REPLICATION |Prepare SSH keys for {{ replica_hostname }}
+  include: 20_prepare_ssh_keys.yml
+  vars:
+    key: replica
+    user_1: "{{ postgresql.username }}"
+    ext_key_pub: master
+  delegate_to: "{{ replica_hostname }}"
+
+
+####################### SSH  ssh-keyscan #######################
+### возиожно потребуется сделать loop
+- name: POSTGRES-REPLICATION |Add SSH fingerprints from {{ backup_hostname }}.{{ domain }} to .ssh/known_hosts
+  include: 30_ssh_keyscan.yml
+  vars:
+    hostname_keyscan: "{{ backup_hostname }}"
+  delegate_to: "{{ master_hostname }}"
+
+- name: POSTGRES-REPLICATION |Add SSH fingerprints from {{ master_hostname }}.{{ domain }} to .ssh/known_hosts
+  include: 30_ssh_keyscan.yml
+  vars:
+    hostname_keyscan: "{{ master_hostname }}"
+  delegate_to: "{{ replica_hostname }}"
+
+- name: POSTGRES-REPLICATION |Recursively change permissions of {{ postgresql_path }}
+  file:
+    path: "{{ postgresql_path }}/11"
+    state: directory
+    recurse: yes
+    mode: '0750'
+  delegate_to: "{{ master_hostname }}"
+
+- name: POSTGRES-REPLICATION |Configuring {{ postgresql_data_path }}/pg_hba.conf on {{ master_hostname }}
+  lineinfile:
+    path: "{{ postgresql_data_path }}/pg_hba.conf"
+    line: "host replication all {{ replica_ip }}/32 trust"
+    state: present
+  notify: restart_postgresql_master
+
+- name: POSTGRES-REPLICATION |Provision {{ postgresql_data_path }}/postgresql.conf to master from template
+  template:
+    owner: postgres
+    group: postgres
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: postgresql-master.conf.j2, dest: "{{ postgresql_data_path }}/postgresql.conf" }
+  notify: restart_postgresql_master
+
+- name: POSTGRES-REPLICATION |Check streaming user
+  become_user: postgres
+  command: psql postgres -tAc "SELECT 1 from pg_roles where rolname='{{ streaming_username }}'"
+  register: streaming_user_exists
+
+- name: POSTGRES-REPLICATION |Create streaming user
+  become_user: postgres
+  when: streaming_user_exists.stdout != "1"
+  command: psql postgres -c "CREATE USER {{ streaming_username }} WITH REPLICATION PASSWORD '{{ streaming_password }}'"
+
+- name: POSTGRES-REPLICATION |Check replication slot
+  become_user: postgres
+  command: psql postgres -tAc "SELECT 1 from pg_replication_slots  where slot_name='{{ replication_slot }}'"
+  register: replication_slot_exists
+
+- name: POSTGRES-REPLICATION |Create replication slot
+  become_user: postgres
+  when: replication_slot_exists.stdout != "1"
+  command: psql postgres -c "SELECT * FROM pg_create_physical_replication_slot('{{ replication_slot }}');"
+
+- name: POSTGRES-REPLICATION |Restart postgresql on {{ master_hostname }}
+  systemd:
+    name: postgresql-11.service
+    state: restarted
+
+- name: POSTGRES-REPLICATION |Create empty archive directory on {{ master_hostname }}
+  file:
+    path: "{{ postgresql_path }}/archive"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0770'
+
+- name: POSTGRES-REPLICATION |Config replica
+  include: 40_config_replica.yml
+  delegate_to: "{{ replica_hostname }}"
+
+...

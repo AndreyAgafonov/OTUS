@@ -1,0 +1,5 @@
+---
+# vars file for nginx
+  nginx_listen_port: 80
+  nginx_root_dir: /usr/share/nginx/html
+  

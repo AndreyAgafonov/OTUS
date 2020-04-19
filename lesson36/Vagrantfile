@@ -1,0 +1,36 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/7"
+
+  config.vm.provider "virtualbox" do |v|
+	  v.memory = 384
+  end
+
+  config.vm.define "nfsServer" do |replica|
+    replica.vm.network "private_network", adapter: 2, :device => "eth1", ip: "192.168.11.160"
+    replica.vm.hostname = "nfs-Server1"
+  end
+
+  config.vm.define "nfsClient1" do |master|
+    master.vm.network "private_network", adapter: 2, :device => "eth1", ip: "192.168.11.161"
+    master.vm.hostname = "nfs-Client1"
+  end
+
+
+  config.vm.provision "shell", run: "always", inline: <<-SHELL
+    mkdir -p ~root/.ssh
+    cp ~vagrant/.ssh/auth* ~root/.ssh
+    setenforce 0
+    #cat /vagrant/id_rsa.pub | awk '{print $1,$2}' >> /root/.ssh/authorized_keys
+  SHELL
+
+  config.vm.provision "ansible" do |ansible|
+    #ansible.compatibility_mode = "2.0"
+    ansible.playbook = "ansible/startall.yml"
+    #ansible.verbose = "true"
+    #ansible.become = "true"
+  end
+
+end

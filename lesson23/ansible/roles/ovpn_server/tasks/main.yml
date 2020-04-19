@@ -1,0 +1,72 @@
+---
+- name:  OpenVPN Server | Generate an OpenSSL private key for OpenVPN server
+  openssl_privatekey:
+    path: "{{ pki_private_path }}{{ OpenVPN_private_key_name }}"
+    size: "{{ OpenVPN_private_key_bits }}"
+
+- name:  OpenVPN Server | Generate an OpenSSL CSR for OpenVPN server
+  openssl_csr:
+    path: "{{ pki_certs_path }}{{ OpenVPN_private_key_name }}.csr"
+    privatekey_path: "{{ pki_private_path }}{{ OpenVPN_private_key_name }}"
+    country_name: "{{ OpenVPN_country_name }}"
+    organization_name: "{{ OpenVPN_org_name }}"
+    email_address: "{{ OpenVPN_email_addr }}"
+    common_name: "{{ OpenVPN_common_name }}"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+
+- name:  OpenVPN Server | Generate server certificate
+  openssl_certificate:
+    subject:
+      CN: "{{ OpenVPN_common_name }}"
+    path: "{{ pki_certs_path }}{{ OpenVPN_cert_name }}"
+    privatekey_path: "{{ pki_private_path }}{{ OpenVPN_private_key_name }}"
+    csr_path: "{{ pki_certs_path }}{{ OpenVPN_private_key_name }}.csr"
+    ownca_path: "{{ pki_certs_path }}{{ CA_cert_name }}"
+    ownca_privatekey_path: "{{ pki_private_path }}{{ CA_private_key_name }}"
+    provider: ownca
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_strict: true
+    extended_key_usage:
+      - clientAuth
+    extended_key_usage_strict: true
+
+- name:  OpenVPN Server | install OpenVPN
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - openvpn
+
+- name:  OpenVPN Server | generate dhparam
+  openssl_dhparam:
+    path: "{{ OpenVPN_server_config_path }}{{ OpenVPN_DH_filename }}"
+    size: "{{ OpenVPN_DH_size }}"
+
+- name:  OpenVPN Server | install config
+  template:
+    backup: true
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: server_tap.conf.j2, dest: "{{ OpenVPN_server_config_path }}server_tap.conf" }
+    - { src: server_tun.conf.j2, dest: "{{ OpenVPN_server_config_path }}server_tun.conf" }
+
+- name:  OpenVPN Server | enable and start OpenVPN-server TUN
+  systemd:
+    name: openvpn-server@server_tun
+    enabled: true
+  notify: restart_openvpn-server@server_tun
+
+- name:  OpenVPN Server | enable and start OpenVPN-server TAP
+  systemd:
+    name: openvpn-server@server_tap
+    enabled: true
+  notify: restart_openvpn-server@server_tap
+...

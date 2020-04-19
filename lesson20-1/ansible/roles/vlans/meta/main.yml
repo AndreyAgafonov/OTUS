@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  author: Andrey Agafonov
+  description: vlans
+  min_ansible_version: 2.9
+dependencies: []
+...

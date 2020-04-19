@@ -1,0 +1,8 @@
+---
+# handlers file for mysql
+- name: restart_network
+  systemd:
+    name: network
+    state: restarted
+    enabled: yes
+...

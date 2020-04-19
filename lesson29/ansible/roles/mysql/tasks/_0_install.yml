@@ -1,0 +1,68 @@
+---
+- name: Install requires
+  pip:
+    name: PyMySQL
+
+- name: Install Percona repo
+  shell: yum install -y https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+
+#- name: install gpgkey
+#  template:
+#    src: "{{ item.src }}"
+#    dest: "{{ item.dest }}"
+#    owner: root
+#    group: wheel
+#    mode: '0644'
+#  with_items:
+#    - { src: files/gpgkey.pub, dest: "/etc/pki/rpm-gpg/PERCONA-PACKAGING-KEY" }
+
+#- name: add home repo
+#  yum_repository:
+#    name: home
+#    description: Home proxy repo
+#    baseurl: http://nas1.home:8081/repository/yum/
+#    gpgkey: file:///etc/pki/rpm-gpg/PERCONA-PACKAGING-KEY
+#    gpgcheck: yes
+
+- name: Install mySQL Percona-Server
+  yum:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+    - Percona-Server-server-57
+  notify:
+  - start_mysql
+
+- name: install config Template
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: wheel
+    mode: '0644'
+  with_items:
+    - { src: 01-base.cnf.j2, dest: "/etc/my.cnf.d/01-base.cnf" }
+    - { src: 02-max-connections.cnf.j2, dest: "/etc/my.cnf.d/02-max-connections.cnf" }
+    - { src: 03-performance.cnf.j2, dest: "/etc/my.cnf.d/03-performance.cnf" }
+    - { src: 04-slow-query.cnf.j2, dest: "/etc/my.cnf.d/04-slow-query.cnf" }
+    - { src: 05-binlog.cnf.j2, dest: "/etc/my.cnf.d/05-binlog.cnf" }
+  notify:
+  - restart_mysql
+
+- name: config Slave replica - ignore table
+  replace:
+    path: /etc/my.cnf.d/05-binlog.cnf
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - { regexp: '^#replicate-ignore-table=bet.events_on_demand', replace: 'replicate-ignore-table=bet.events_on_demand' }
+    - { regexp: '^#replicate-ignore-table=bet.v_same_event', replace: 'replicate-ignore-table=bet.v_same_event' }
+  when: inventory_hostname in groups['mysqlSlave']
+
+- name: start_mysql
+  systemd:
+    name: mysql
+    state: started
+    enabled: yes
+

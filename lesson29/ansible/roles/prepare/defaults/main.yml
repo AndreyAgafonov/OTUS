@@ -1,0 +1,10 @@
+---
+# defaults file for nginx
+prepare_pakages:
+    - ntp
+    - tzdata
+    - python2-cryptography
+    - yum-utils
+    - python
+    - python-pip
+ntp_timezone: Europe/Moscow

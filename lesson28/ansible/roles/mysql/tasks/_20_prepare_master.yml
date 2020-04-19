@@ -1,0 +1,48 @@
+---
+- name: Create BD {{ wordpress_db }}
+  mysql_db:
+    name:
+        - "{{ wordpress_db }}"
+        - "{{ ghost_mysql_db }}"
+    state: present
+    login_unix_socket: "{{ mysql_sock }}"
+
+#- name: Restore DB {{ wordpress_db }} from dump
+#  mysql_db:
+#    name:
+#        - "{{ wordpress_db }}"
+#    state: import
+#    login_unix_socket: "{{ mysql_sock }}"
+#    target: /vagrant/ansible/roles/mysql/files/bet.dmp
+#    #shell: mysql -uroot -p'{{ mysql_password }}' -D bet < /vagrant/ansible/roles/mysql/files/bet.dmp
+
+- name: Create user "{{ wordpress_user}}" for replication
+  mysql_user:
+    name: "{{ item.name }}"
+    host: "{{ item.host }}"
+    password: "{{ item.password }}"
+    priv: "{{ item.priv }}"
+    state: present
+  with_items:
+    - { name: "{{ wordpress_user }}" , host: "{{ wordpress_host }}" , password: "{{ wordpress_password }}", priv: "{{ wordpress_db }}.*:ALL" }
+    - { name: "{{ ghost_mysql_user }}" , host: "{{ ghost_mysql_host }}" , password: "{{ ghost_mysql_password }}", priv: "{{ ghost_mysql_db }}.*:ALL"}
+
+
+
+#- name: Dump all databases to {{ temp_dst_file_dump }}
+#  mysql_db:
+#    state: dump
+#    name: all
+#    target: /tmp/dump.sql
+#    ignore_tables:
+#        - bet.events_on_demand
+#        - bet.v_same_event
+
+#- name: Dump databases shell
+#  shell: mysqldump --all-databases --triggers --routines --master-data --ignore-table=bet.events_on_demand --ignore-table=bet.v_same_event > "{{ temp_dst_file_dump }}"
+
+#- name: Get dump
+#  fetch:
+#    src: "{{ temp_dst_file_dump }}"
+#    dest: "{{ temp_src_file_dump }}"
+#    flat: yes

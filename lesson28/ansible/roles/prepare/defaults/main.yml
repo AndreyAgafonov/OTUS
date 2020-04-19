@@ -1,0 +1,15 @@
+---
+# defaults file for nginx
+prepare_pakages:
+    - curl
+    - htop
+    - lsof
+    - mc
+    - ntp
+    - python
+    - python-pip
+    - python2-cryptography
+    - tzdata
+    - wget
+    - yum-utils
+    - unzip

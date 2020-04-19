@@ -1,0 +1,5 @@
+role_hostname: mailserver
+allowed_networks: "192.168.11.0/24"
+listen_ip: "192.168.11.200 10.0.2.15"
+user: vagrant
+password: SuperSecret

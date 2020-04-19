@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+#
+events {
+    worker_connections 1024;
+}
+
+http {
+    server {
+        listen       80 default_server;
+        server_name  default_server;
+        root         /usr/share/nginx/html;
+        error_log /var/log/nginx/error.log debug;
+        access_log /var/log/nginx/access.log debug;
+        location / {
+        }
+    }
+}
+#daemon off;

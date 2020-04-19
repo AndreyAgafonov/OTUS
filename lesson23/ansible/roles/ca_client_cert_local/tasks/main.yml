@@ -1,0 +1,42 @@
+---
+- name:  CA Client cert |Generate an OpenSSL private key for OpenVPN client
+  openssl_privatekey:
+    path: "/tmp/{{ OpenVPN_ras_client_private_key_name }}"
+    size: "{{ OpenVPN_private_key_bits }}"
+
+- name:  CA Client cert |Generate an OpenSSL CSR for OpenVPN client
+  openssl_csr:
+    path: "/tmp/{{ OpenVPN_ras_client_private_key_name }}.csr"
+    organization_name: "{{ OpenVPN_ras_org_name }}"
+    common_name: "{{ OpenVPN_ras_client_common_name }}"
+    email_address: "{{ OpenVPN_ras_email_addr }}"
+    privatekey_path: "/tmp/{{ OpenVPN_ras_client_private_key_name }}"
+    country_name: "{{ OpenVPN_ras_country_name }}"
+    extended_key_usage:
+      - clientAuth
+    key_usage:
+      - digitalSignature
+
+- name:  CA Client cert |Generate client certificate
+  openssl_certificate:
+    csr_path: "/tmp/{{ OpenVPN_ras_client_private_key_name }}.csr"
+    ownca_path: "{{ pki_certs_path }}{{ CA_cert_name }}"
+    path: "/tmp/{{ OpenVPN_ras_client_cert_name }}"
+    provider: ownca
+    ownca_privatekey_path: "{{ pki_private_path }}{{ CA_private_key_name }}"
+    key_usage_strict: true
+    key_usage:
+      - digitalSignature
+    extended_key_usage:
+      - clientAuth
+    extended_key_usage_strict: true
+
+- name:  CA Client cert |Fetch client RAS CA, certificate and private key from server to /tmp on localhost
+  fetch:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "/tmp/{{ OpenVPN_ras_client_cert_name }}", dest: "/tmp" }
+    - { src: "/tmp/{{ OpenVPN_ras_client_private_key_name }}", dest: "/tmp"  }
+    - { src: "{{ pki_certs_path }}{{ CA_cert_name }}", dest: "/tmp" }
+...

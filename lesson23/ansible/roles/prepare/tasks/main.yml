@@ -1,0 +1,48 @@
+---
+- name:  PREPARE | template disable ipv6
+  template:
+    dest: /etc/sysctl.d/ipv6.conf
+    src: ipv6.conf.j2
+    owner: root
+    group: root
+    mode: '0644'
+
+- name:  PREPARE | apply sysctl config
+  become: yes
+  shell: sysctl -p
+
+- name:  PREPARE | restart network
+  systemd:
+    name: network
+    state: restarted
+
+- name:  PREPARE | install epel-release
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - epel-release
+
+- name:  PREPARE | install packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - ntp
+    #- python-apt
+    - python2-cryptography
+    - mc
+
+- name:  PREPARE | set timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name:  PREPARE | enable ntpd
+  systemd:
+    name: ntpd
+    enabled: true
+  notify: restart ntpd
+
+...

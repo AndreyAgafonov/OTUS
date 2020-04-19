@@ -1,0 +1,30 @@
+---
+- name: First Step Install  Postgresql  on replica
+  hosts: replica
+  become: true
+  gather_facts: yes
+  tags:
+    - base
+  roles:
+    - postgres_install
+
+- name: Second step deploy postgresql and config replication
+  hosts: master
+  become: true
+  gather_facts: yes
+  tags:
+    - base
+  roles:
+    - postgres_install
+    - postgres_replication
+
+- name: base (otus-pgsql homework)
+  hosts: backup
+  become: true
+  gather_facts: yes
+  tags:
+    - base
+  roles:
+    - postgres_client
+    - postgres_barman
+...

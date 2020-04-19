@@ -1,0 +1,30 @@
+---
+- name: Install epel-release
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - epel-release
+
+- name: Install packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - ntp
+    - python2-cryptography
+    - mc
+- name: Set timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name: Enable ntpd
+  systemd:
+    name: ntpd
+    enabled: true
+    state: restarted
+
+
+...

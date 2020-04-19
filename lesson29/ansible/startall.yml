@@ -1,0 +1,8 @@
+---
+- name: Lesson29 install mySQL server
+  hosts: all
+  become: true
+
+  roles:
+    - mysql
+

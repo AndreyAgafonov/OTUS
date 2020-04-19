@@ -1,0 +1,39 @@
+---
+- name: POSTGRES-REPLICATION |Create {{ postgresql_path }}/.ssh/known_hosts on {{ backup_hostname }}
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { path: "{{ postgresql_path }}/.ssh", owner: postgres , group: postgres , mode: '0755' , state: directory }
+    - { path: "{{ postgresql_path }}/.ssh/known_hosts", owner: postgres , group: postgres , mode: '0644' , state: touch }
+
+- name: POSTGRES-REPLICATION |Prepare SSH config for {{ master_hostname }}
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - {src: "files/keys/{{ key }}" ,dest: "{{ postgresql_path }}/.ssh/id_rsa" ,owner: "{{ user_1 }}" ,group: "{{ user_1 }}" ,mode: '0600' }
+    - {src: "files/keys/{{ key }}.pub" ,dest: "{{ postgresql_path }}/.ssh/id_rsa.pub" ,owner: "{{ user_1 }}" ,group: "{{ user_1 }}" ,mode: '0644' }
+    - {src: "files/keys/{{ ext_key_pub }}.pub" ,dest: "/tmp/id_rsa.pub" ,owner: root ,group: root ,mode: '0600' }
+
+- name: POSTGRES-REPLICATION |register pub key in temp varaible
+  command: "cat /tmp/id_rsa.pub"
+  register: public_key
+
+- name: POSTGRES-REPLICATION |Add public key to authorized keys
+  authorized_key:
+    user:  "{{ item }}"
+    state: present
+    key: "{{ public_key.stdout }}"
+  with_items:
+    - "{{ user_1 }}"
+
+
+
+  #прогнать авторизацию keyscan

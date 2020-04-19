@@ -1,0 +1,27 @@
+---
+ntp_timezone: Europe/Moscow
+domain: cloud16.home
+postgresql_path: /var/lib/pgsql
+postgresql_data_path: /var/lib/pgsql/11/data
+postgresql:
+  username: postgres
+master_ip: 192.168.11.150
+master_hostname: master
+replica_ip: 192.168.11.151
+replica_hostname: replica
+backup_ip: 192.168.11.152
+backup_hostname: backup
+streaming_username: streaming_user
+streaming_password: hFKyvJetkeqlHJOREIZR
+replication_slot: replication_slot
+
+barman:
+  username: barman
+  password: mUxlMc6WN9OzIQFQuaDY
+  slot: barman
+  home: /var/lib/barman
+  streaming:
+    username: barman_streaming_user
+    password: 34jQPm9v9h78KCOErF9e
+
+...

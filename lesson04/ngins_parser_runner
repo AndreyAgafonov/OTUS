@@ -1,0 +1,2 @@
+# cron for nginx_log_parser
+0 * * * * root /vagrant/parser.sh

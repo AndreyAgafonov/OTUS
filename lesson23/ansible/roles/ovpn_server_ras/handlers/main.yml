@@ -1,0 +1,6 @@
+---
+- name: restart_openvpn-server@server_ras
+  systemd:
+    name: openvpn-server@server_ras
+    state: restarted
+...

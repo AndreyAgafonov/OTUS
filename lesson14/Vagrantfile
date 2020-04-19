@@ -1,0 +1,75 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+home = ENV['HOME']
+
+MACHINES = {
+  :pam => {
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.140',
+  }
+}
+
+Vagrant.configure("2") do |config|
+
+  MACHINES.each do |boxname, boxconfig|
+
+      config.vm.define boxname do |box|
+
+          box.vm.box = boxconfig[:box_name]
+          box.vm.host_name = boxname.to_s
+
+          box.vm.network "private_network", ip: boxconfig[:ip_addr]
+
+          box.vm.provider :virtualbox do |vb|
+          vb.customize ["modifyvm", :id, "--memory", "256"]
+          vb.name = boxname.to_s
+
+          end
+
+      box.vm.provision "shell", inline: <<-SHELL
+          mkdir -p ~root/.ssh
+          cp ~vagrant/.ssh/auth* ~root/.ssh
+      SHELL
+
+      case boxname.to_s
+      when "pam"
+        box.vm.provision "shell", run: "always", inline: <<-SHELL
+		  
+		  yum install epel-release -y
+      yum install pam_script ssh mc docker docker-compose -y
+		  # Разрешаем авторизацию по паролю - если запрещено
+		  sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+      systemctl restart sshd
+      # Добавляем проверку  по условию задачи через скрипт
+      #mkdir /etc/pamunlockscript
+      chmod +x /vagrant/pam_script_auth
+      #cp /vagrant/pam_script_auth /etc/pamunlockscript/
+      #Правило Для инициации проверки - Если сегодня выходной
+      sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+      sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
+      
+      echo "+:(admin):ALL" >> /etc/security/access.conf
+      echo "-:ALL:ALL" >> /etc/security/access.conf
+      
+      
+		  groupadd admin
+		  useradd -G admin sveta
+		  #Устанавливаем супер сложный пароль )))
+		  echo qwerty12 | passwd sveta --stdin
+		  useradd nastya
+      echo qwerty12 | passwd nastya --stdin
+      # Отключаю SELinux - пока не понимаю почему блокируется
+      sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+      #Отключаю сразу, что бы не перезагружаться.
+      setenforce 0
+      # Задание со звездочкой.
+      #sed -i "2i auth       [success=1 default=ignore] pam_exec.so /vagrant/pam_script_auth" /etc/pam.d/sshd
+      #sed -i "3i auth       required     pam_access.so" /etc/pam.d/sshd
+      ip -4 a |grep inet
+      SHELL
+      end
+
+      end
+   end
+end
+

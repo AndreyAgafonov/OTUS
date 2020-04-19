@@ -1,0 +1,15 @@
+---
+- name: NFS-Server
+  hosts: nfsServer
+  become: true
+  gather_facts: yes
+  roles:
+    - nfs-server
+
+- name: NFS-client
+  hosts: nfsClient1
+  become: true
+  gather_facts: yes
+  roles:
+    - nfs-client
+...

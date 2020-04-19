@@ -1,0 +1,12 @@
+- name: Scan host for SSH fingerprints
+  command: "ssh-keyscan -H {{ hostname_keyscan }}.{{ domain }}"
+  register: server_known_hosts
+
+- name: Add fingerprints to known_hosts
+  lineinfile:
+    path: "{{ item }}/.ssh/known_hosts"
+    line: "{{ server_known_hosts.stdout }}"
+    state: present
+  with_items:
+    - "{{ postgresql_path }}"
+    - "{{ barman.home }}"

@@ -1,0 +1,10 @@
+---
+  - name: Inastall Kibana
+    hosts: kibana
+    become: true
+    gather_facts: True
+
+
+    roles:
+      - kibana
+

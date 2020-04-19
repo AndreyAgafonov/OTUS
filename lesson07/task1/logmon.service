@@ -1,0 +1,8 @@
+[Unit]
+Description=Log monitor.
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/sysconfig/logmon
+ExecStart=/opt/logmon.sh $LOG_TO_MON $WORD
+

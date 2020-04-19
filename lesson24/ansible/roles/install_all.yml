@@ -1,0 +1,9 @@
+---
+  - name: Config OSPF
+    hosts: ospf
+    become: true
+    gather_facts: True
+
+
+    roles:
+      - ospf

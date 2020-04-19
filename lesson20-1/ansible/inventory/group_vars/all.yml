@@ -1,0 +1,5 @@
+---
+  domain: mydomain.test
+  ansible_ssh_private_key_file: /vagrant/ansible.pem
+  ansible_user: vagrant
+

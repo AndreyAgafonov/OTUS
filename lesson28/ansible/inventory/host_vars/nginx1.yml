@@ -1,0 +1,18 @@
+conf_path: /etc/nginx/conf.d/
+domain: cloud16.home #prepare
+server_name: dynamic-content
+hostname: nginx1 #prepare
+
+wordpress_db: wordpress
+wordpress_user: wordpress
+wordpress_password: "81QxqbKV[U"
+wordpress_host: "%"
+
+
+ghost_mysql_db: ghost
+ghost_mysql_user: ghost_mysql
+ghost_mysql_password: "80mGl[wTEt"
+ghost_mysql_host: "%"
+ghost_work_dir: /opt/ghost
+
+nodejs_version: 10.13.0

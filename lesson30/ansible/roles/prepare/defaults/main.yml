@@ -1,0 +1,7 @@
+ntp_timezone: Europe/Moscow
+domain: cloud16.home
+prepare_pakages:
+  - ntp
+  - python2-cryptography
+  - mc
+

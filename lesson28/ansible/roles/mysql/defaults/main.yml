@@ -1,0 +1,14 @@
+---
+# defaults file for mysql
+server_id: 1
+mysql_sock: /var/lib/mysql/mysql.sock
+mysql_login: root
+mysql_password: "X7TKK1Ze{1"
+
+temp_src_file_dump: /tmp/dump.sql
+temp_dst_file_dump: /tmp/dump.sql
+
+#wordpress_db: bet
+#wordpress_user: repl
+#wordpress_password: "81QxqbKV[U"
+#wordpress_host: "%"

@@ -1,0 +1,27 @@
+---
+- name: OpenVPN server
+  hosts: server
+  become: true
+  roles:
+    - ca_server
+    - ovpn_server
+
+- name: OpenVPN client
+  hosts: client
+  become: true
+  roles:
+    - ovpn_client
+
+- name: OpenVPN ras server
+  hosts: server
+  become: true
+  roles:
+    - ovpn_server_ras
+
+- name: OpenVPN ras client
+  hosts: server
+  become: true
+  roles:
+    - ca_client_cert_local
+
+...

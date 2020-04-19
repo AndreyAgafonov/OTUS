@@ -1,0 +1,19 @@
+---
+- name: POSTFIX-SERVER |install postfix
+  yum:
+    name: postfix
+    state: present
+  notify: restart postfix
+
+- name: POSTFIX-SERVER |install mail client util
+  yum:
+    name: mailx
+    state: present
+
+- name: POSTFIX-SERVER |copy postfix config file
+  template:
+    src: main.cf
+    dest: /etc/postfix/main.cf
+    force: yes
+  notify: restart postfix
+...

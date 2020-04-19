@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "centos/7"
+
+  config.vm.provider "virtualbox" do |v|
+	  v.memory = 384
+  end
+
+  config.vm.define "server" do |server|
+    server.vm.hostname = "mailserver.cloud16.home"
+    server.vm.network "private_network", ip: "192.168.11.200"
+    server.vm.provision "shell", run: "always", inline: <<-SHELL
+    bash +x /vagrant/provision.sh
+    SHELL
+  end
+
+  config.vm.define "ansible" do |ansible|
+    ansible.vm.hostname = "ansible.cloud16.home"
+    ansible.vm.network "private_network", ip: "192.168.11.220"
+    provision_script = './ansible/provision.sh'
+    ansible.vm.provision "shell", run: "always", path: provision_script
+  end
+
+
+end

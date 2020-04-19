@@ -1,0 +1,64 @@
+---
+- name:  NFS-SERVER | Prepare fot install NFS Server
+  yum:
+      name: "{{ packages }}"
+  vars:
+    packages:
+      - nfs-utils
+
+
+- name:  NFS-SERVER | Create data folder
+  file:
+    path: "{{ datafolder }}"
+    state: directory
+    mode: '0755'
+
+- name:  NFS-SERVER | Create upload folder
+  file:
+    path: "{{ datafolder }}/upload"
+    state: directory
+    mode: o+w
+
+- name:  NFS-SERVER | Config NFS Server
+  lineinfile:
+    path: /etc/exports
+    line: "{{ item }}"
+    create: yes
+  with_items:
+    - "{{ datafolder }} {{ nfs_server_allow_host }}(rw,sync,root_squash,no_subtree_check)"
+
+- name: NFS-SERVER | Config NFS Server on NFSV4 only
+  lineinfile:
+    path: /etc/nfs.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^# vers3=y", line: "vers3=y"  }
+
+
+- name:  NFS-SERVER | Enable firewalld
+  systemd:
+    service: firewalld
+    state: started
+    enabled: yes
+
+- name:  NFS-SERVER | add rules allow NFS to firewall
+  command: "{{ item }}"
+  with_items:
+  - firewall-cmd --permanent --add-service=nfs --zone=public
+  - firewall-cmd --permanent --add-service=mountd --zone=public
+  - firewall-cmd --permanent --add-service=rpc-bind --zone=public
+  - firewall-cmd --permanent --add-port=2049/udp --zone=public
+  - firewall-cmd --reload
+
+
+- name:  NFS-SERVER | Enable NFS Server
+  systemd:
+    state: started
+    name: "{{ item }}"
+    enabled: yes
+  with_items:
+    - rpcbind
+    - nfs-server
+    - nfs-lock
+    - nfs-idmap
