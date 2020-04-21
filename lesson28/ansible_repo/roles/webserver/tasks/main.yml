@@ -1,0 +1,47 @@
+---
+- name: Create config dir for Wordpress
+  file:
+    path: "{{ config_dir }}/wordpress/"
+    owner: root
+    group: root
+    mode: '0644'
+    state: directory
+
+- name: Create config dir for Python
+  file:
+    path: "{{ config_dir }}/python/"
+    owner: root
+    group: root
+    mode: '0644'
+    state: directory
+
+- name: Create config dir for Ghost
+  file:
+    path: "{{ config_dir }}/ghost/"
+    owner: root
+    group: root
+    mode: '0644'
+    state: directory
+
+- name: Provision docker-compose file
+  template:
+    owner: root
+    group: root
+    mode: '0644'
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: docker-compose.yml.j2, dest: "{{ work_dir }}/docker-compose.yml" }
+    - { src: base_nginx.conf.j2, dest: "{{ config_dir }}/nginx.conf" }
+    - { src: wordpress_php.ini.j2, dest: "{{ config_dir }}/wordpress/wordpress_php.ini" }
+    - { src: wordpress_mysql.cnf.j2, dest: "{{ config_dir }}/wordpress/wordpress_mysql.cnf" }
+    - { src: wordpress_nginx.conf.j2, dest: "{{ config_dir }}/wordpress/wordpress_nginx.conf" }
+    - { src: python_nginx.conf.j2, dest: "{{ config_dir }}/python/python_nginx.conf" }
+    - { src: ghost_mysql.cnf.j2, dest: "{{ config_dir }}/ghost/ghost_mysql.cnf" }
+    - { src: ghost_nginx.conf.j2, dest: "{{ config_dir }}/ghost/ghost_nginx.conf" }
+
+# - name:  run docker-comppose
+#   docker_compose:
+#     project_src: "{{ work_dir }}"
+
+...

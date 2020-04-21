@@ -1,0 +1,59 @@
+---
+# Добавим epel-release на всякий случай
+- name: epel-release install
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - epel-release
+
+# Добавим репозиторий docker ...
+- name: add docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+
+# ... и дёрнем yum для обновления
+- name: yum update cache
+  yum:
+    update_cache: yes
+
+# Установим необходимые пакеты
+- name: docker install
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose
+    # - docker-py
+
+- name: Install Docker-py
+  pip:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+      - docker
+      # - docker-compose
+      - pyyaml
+
+
+# - name: Install docker-compose
+#   command: pip3 install docker-compose
+
+# Запустим docker
+- name: enable docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+  notify: restart_docker
+...

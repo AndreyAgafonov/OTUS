@@ -1,0 +1,10 @@
+---
+- name: Web server Dynamic content
+  hosts: webserver
+  become: true
+  tags:
+    - docker
+
+  roles:
+    - webserver
+...

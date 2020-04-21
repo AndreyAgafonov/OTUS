@@ -1,7 +1,0 @@
----
-# handlers file for ghost
-- name: restart ghost
-  service:
-    name: "{{ ghost_service_name }}"
-    state: restarted
-  become: yes

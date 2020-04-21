@@ -1,0 +1,8 @@
+---
+ntp_timezone: Europe/Moscow
+domain: cloud16.home
+webserver_hostname: webserver
+webserver_ip: 192.168.11.115
+db_password: 'M9fG=z4K]by'
+#hostname: webserver
+...
