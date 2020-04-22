@@ -1,0 +1,8 @@
+---
+- name: test
+  debug:
+    msg:
+      - "{{ hostvars[ groups['postgres'][0]]['ansible_host'] }}"
+      #- "{{ hostvars[ groups['mongodb_shard1'][0]]['mongodb_replicaset_name'] }}"
+
+    #.{{ domain }}:{{ mongodb_port }}"

@@ -1,0 +1,21 @@
+
+- name: Deploy postgres-cluster
+  hosts: postgres
+  become: true
+  gather_facts: yes
+  roles:
+    - patroni
+    - haproxy
+
+- name: deploy consul
+  hosts: consul
+  become: True
+  roles:
+    - consul
+
+# - name: Deploy cluster
+#   hosts: postgres
+#   become: True
+#   roles:
+#     - patroni
+

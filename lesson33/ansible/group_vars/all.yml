@@ -1,0 +1,16 @@
+---
+ntp_timezone: Europe/Moscow
+domain: cloud16.home
+patroni_password: 'xB5rertyuGHEzw6xf'
+
+
+postgresql_node:
+  - "{{ groups.postgres[0] }}"
+  - "{{ groups.postgres[1] }}"
+  - "{{ groups.postgres[2] }}"
+#when: (inventory_hostname in mongodb_router[0])
+
+
+ansible_user: vagrant
+ansible_ssh_private_key_file: /vagrant/ansible.pem
+...

@@ -1,0 +1,54 @@
+---
+- name: PREPARE |Install epel-release
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - epel-release
+
+# - name: Install Centos Release
+#   command: sudo yum install -y https://centos7.iuscommunity.org/ius-release.rpm
+
+- name:  PREPARE |Install packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - ntp
+    - python2-cryptography
+    # - python36u
+    # - python36u-libs
+    # - python36u-devel
+    # - python36u-pip
+    # - python36u-setuptools
+
+- name:  PREPARE |Set timezone
+  timezone:
+    name: "{{ ntp_timezone }}"
+
+- name: Enable ntpd
+  systemd:
+    name: ntpd
+    enabled: true
+    state: restarted
+
+- name:  PREPARE |Add IP of host to hosts
+  replace:
+    path: /etc/hosts
+    regexp: '^127\.0\.0\.1(\s+){{ ansible_hostname }}(\s+){{ ansible_hostname }}.*'
+    replace: "{{ ansible_host }} {{ ansible_hostname }}.{{ domain }} {{ ansible_hostname }}"
+
+
+- name:  PREPARE | "Add all names to host (bacose we do not have a DNS Server)"
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - { line: "{{ hostvars[ groups['postgres'][0]]['ansible_host'] }}  {{ postgresql_node[0] }} {{ postgresql_node[0] }}.{{ domain }}" }
+    - { line: "{{ hostvars[ groups['postgres'][0]]['ansible_host'] }}  {{ postgresql_node[1] }} {{ postgresql_node[1] }}.{{ domain }}" }
+    - { line: "{{ hostvars[ groups['postgres'][0]]['ansible_host'] }}  {{ postgresql_node[2] }} {{ postgresql_node[2] }}.{{ domain }}" }
+
+...
