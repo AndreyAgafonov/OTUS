@@ -24,7 +24,7 @@ bash +x vagrantup.sh
 
 Проверяем статус Patroni
 
-![patroni](images/patroni.png)
+![patroni](images/patroni-status.png)
 
 
 Создать тестовую базу и проверить работу репликации:
