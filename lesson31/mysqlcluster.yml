@@ -1,0 +1,70 @@
+---
+- name: MYSQL-CLUSTER | Install docker docker-compose
+  hosts: mysql
+  become: true
+  vars:
+    MYSQL_ROOT_PASSWORD: 'SsyEEbBPtYESwc9'
+  tasks:
+
+    - name:  MYSQL-CLUSTER |Put SELinux in permissive mode
+      selinux:
+        policy: targeted
+        state: permissive
+
+    - name:  MYSQL-CLUSTER |install epel-release
+      yum:
+        name: epel-release
+        state: present
+
+    - name:  MYSQL-CLUSTER |install docker
+      yum:
+        name: docker
+        state: present
+
+    - name:  MYSQL-CLUSTER |docker is started and runs at startup
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name:  MYSQL-CLUSTER |install python-pip
+      yum:
+        name:
+        - python-pip
+        - python-devel
+        - gcc
+        state: present
+
+    - name:  MYSQL-CLUSTER |update python-pip
+      pip:
+        name: pip
+        extra_args: --upgrade
+
+    - name:  MYSQL-CLUSTER | Prepare  config for deploy
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+        owner: root
+        group: root
+      with_items:
+        - {src: setupCluster.js.j2 , dest: /opt/setupCluster.js }
+        - {src: docker-compose.yml.j2 , dest: /opt/docker-compose.yml}
+
+    - name:  MYSQL-CLUSTER |install docker-compose
+      pip:
+        name: docker-compose
+
+    - name:  MYSQL-CLUSTER |run docker-compose
+      command: docker-compose -f /opt/docker-compose.yml up -d
+
+    - name: MYSQL-CLUSTER | add MySQL Repo
+      yum:
+        name: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+        state: present
+
+    - name: MYSQL-CLUSTER | Install mysql-shell
+      yum:
+        name: mysql-shell
+        state: present
+      # yum install -y mysql-shell
