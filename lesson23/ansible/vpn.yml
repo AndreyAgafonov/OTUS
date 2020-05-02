@@ -4,19 +4,19 @@
   become: true
   roles:
     - ca_server
-    - ovpn_server
+    - openvpn_server
 
 - name: OpenVPN client
   hosts: client
   become: true
   roles:
-    - ovpn_client
+    - openvpn_client
 
 - name: OpenVPN ras server
   hosts: server
   become: true
   roles:
-    - ovpn_server_ras
+    - openvpn_server_ras
 
 - name: OpenVPN ras client
   hosts: server

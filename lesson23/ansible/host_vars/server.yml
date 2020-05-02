@@ -1,7 +1,5 @@
 ---
 hostname: server
 OpenVPN_common_name: server
-OpenVPN_country_name: RU
-OpenVPN_email_addr: admin@cloud16.ru
-OpenVPN_org_name: cloud16.ru
+
 ...
