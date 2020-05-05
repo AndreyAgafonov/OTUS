@@ -1,41 +1,20 @@
 ---
-#- name: vlans (otus-bonds and vlans homework)
-#  hosts: testServer1
-#  become: true
-#  tags:
-#    - vlans
 
-#  roles:
-#    - vlans
+- name: vlans
+  hosts:
+    - testClient1
+    - testClient2
+    - testServer1
+    - testServer2
+  become: true
+  tags:
+    - vlans
 
-#- name: vlans (otus-bonds and vlans homework)
-#  hosts: testServer2
-#  become: true
-#  tags:
-#    - vlans
+  roles:
+    - vlans
 
-  #roles:
-  #  - vlans
-
-#- name: vlans (otus-bonds and vlans homework)
-#  hosts: testClient1
-#  become: true
-#  tags:
-#    - vlans
-
-#  roles:
-#    - vlans
-
-#- name: vlans (otus-bonds and vlans homework)
-#  hosts: testClient2
-#  become: true
-#  tags:
-#    - vlans
-
-#  roles:
-#    - vlans
 ##########################
-- name: bonds (otus-bonds)
+- name: bonds
   hosts: bond
   become: true
   tags:

@@ -20,5 +20,8 @@
     dest: "{{ item.dest }}"
   with_items:
     - { src: ifcfg-vlan1.j2, dest: "/etc/sysconfig/network-scripts/ifcfg-{{ config_device }}.{{ vlanid_1 }}" }
-  notify: restart_network
-...
+
+- name: restart_network
+  systemd:
+    name: network
+    state: restarted

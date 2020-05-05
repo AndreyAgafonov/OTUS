@@ -26,6 +26,10 @@ chmod 0600 /vagrant/ansible/ansible.pem
 
 echo "172.16.10.20 centralrouter" >> /etc/hosts
 echo "172.16.10.30 inetrouter" >> /etc/hosts
+echo "172.16.10.101 testClient1" >> /etc/hosts
+echo "172.16.10.102 testClient2" >> /etc/hosts
+echo "172.16.10.201 testServer1" >> /etc/hosts
+echo "172.16.10.202 testServer2" >> /etc/hosts
 
 # Устанавливаем Nginx
 cd /vagrant/ansible

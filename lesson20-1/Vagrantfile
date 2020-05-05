@@ -72,30 +72,62 @@ MACHINES = {
                 ]
   },
 
-  :office2Router => {
-    :box_name => "centos/7",
-    :net => [
-               {ip: '192.168.1.1', adapter: 2, netmask: "255.255.255.128", virtualbox__intnet: "office2-dev"},
-               {ip: '192.168.1.129', adapter: 3, netmask: "255.255.255.192", virtualbox__intnet: "office2-test-servers"},
-               {ip: '192.168.1.193', adapter: 4, netmask: "255.255.255.192", virtualbox__intnet: "office2-hardware"},
-               {ip: '192.168.255.10', adapter: 5, netmask: "255.255.255.252", virtualbox__intnet: "mgt-net"},
+:testClient1 => {
+  :box_name => "centos/7",
+  :net => [
+                  {adapter: 2, auto_config: false, virtualbox__intnet: "office1-test servers" },
+                  {ip: '172.16.10.101', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "ansible"},
             ]
 },
 
-:office1Server => {
+:testClient2 => {
   :box_name => "centos/7",
   :net => [
-             {ip: '192.168.2.2', adapter: 2, netmask: "255.255.255.192", virtualbox__intnet: "office1-dev"},
-
+                {adapter: 2, auto_config: false, virtualbox__intnet: "office1-test servers" },
+                {ip: '172.16.10.102', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "ansible"},
           ]
 },
 
-:office2Server => {
+:testServer1 => {
   :box_name => "centos/7",
   :net => [
-             {ip: '192.168.1.2', adapter: 2, netmask: "255.255.255.128", virtualbox__intnet: "office2-dev"},
+                {adapter: 2, auto_config: false, virtualbox__intnet: "office1-test servers" },
+                {ip: '172.16.10.201', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "ansible"},
           ]
 },
+:testServer2 => {
+  :box_name => "centos/7",
+  :net => [
+                {adapter: 2, auto_config: false, virtualbox__intnet: "office1-test servers" },
+                {ip: '172.16.10.202', adapter: 3, netmask: "255.255.255.0", virtualbox__intnet: "ansible"},
+          ]
+},
+
+
+#   :office2Router => {
+#     :box_name => "centos/7",
+#     :net => [
+#                {ip: '192.168.1.1', adapter: 2, netmask: "255.255.255.128", virtualbox__intnet: "office2-dev"},
+#                {ip: '192.168.1.129', adapter: 3, netmask: "255.255.255.192", virtualbox__intnet: "office2-test-servers"},
+#                {ip: '192.168.1.193', adapter: 4, netmask: "255.255.255.192", virtualbox__intnet: "office2-hardware"},
+#                {ip: '192.168.255.10', adapter: 5, netmask: "255.255.255.252", virtualbox__intnet: "mgt-net"},
+#             ]
+# },
+
+# :office1Server => {
+#   :box_name => "centos/7",
+#   :net => [
+#              {ip: '192.168.2.2', adapter: 2, netmask: "255.255.255.192", virtualbox__intnet: "office1-dev"},
+
+#           ]
+# },
+
+# :office2Server => {
+#   :box_name => "centos/7",
+#   :net => [
+#              {ip: '192.168.1.2', adapter: 2, netmask: "255.255.255.128", virtualbox__intnet: "office2-dev"},
+#           ]
+# },
 :ansible => { #must be last
   :box_name => "centos/7",
   :net => [

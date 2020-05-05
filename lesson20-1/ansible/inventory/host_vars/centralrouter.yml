@@ -4,7 +4,6 @@ bond_config_device_1: eth1
 bond_config_device_2: eth5
 bond_device: bond0
 bond_netmask: 255.255.255.252
-#bond_network:
 bond_address: 192.168.255.2
 bond_address_neighbor: 192.168.255.1
 centralrouter_gw: 192.168.255.1
