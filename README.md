@@ -16,20 +16,20 @@ OTUS
 - [X] [:alien: Lesson 13 Настраиваем центральный сервер для сбора логов](lesson*13*)
 - [X] [:innocent: Lesson 14 Docker, docker-compose, dockerfile](lesson14)
 - [X] [Lesson 18 разворачиваем сетевую лабораторию](lesson18)
-- [ ] Lesson 16 настраиваем split-dns
+- [X] Lesson 16 настраиваем split-dns
 - [X] [Lesson 16 LDAP](lesson16)
 - [X] Lesson 18 OSPF
 - [X] [Lesson 20 Фильтрация трафика, сценарии iptables](lesson20)
-- [ ] Lesson 20 VPN
-- [ ] Lesson 21 строим бонды и вланы
+- [X] Lesson 20 VPN
+- [X] Lesson 21 строим бонды и вланы
 - [X] Lesson 22 Простая защита от DDOS
-- [ ] Lesson 23 Собрать стенд с 3мя проектами на выбор
+- [X] Lesson 23 Собрать стенд с 3мя проектами на выбор
 - [X] [Lesson 24 развернуть базу из дампа и настроить репликацию](lesson29)
-- [ ] Lesson 25 mysql cluster
-- [ ] Lesson 26 установка почтового сервера
-- [ ] [Lesson 27 PostgreSQL](lesson32)
-- [ ] Lesson 28 Vagrant стенд для NFS или SAMBA
-- [ ] Lesson 29 Проектная работа
+- [X] Lesson 25 mysql cluster
+- [X] Lesson 26 установка почтового сервера
+- [X] [Lesson 27 PostgreSQL](lesson32)
+- [X] Lesson 28 Vagrant стенд для NFS или SAMBA
+- [x] Lesson 29 Проектная работа
 
 Если у вас есть вопросы пишите мне. :smile:
 Andrey
